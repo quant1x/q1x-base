@@ -15,9 +15,9 @@ echo "正在上传PyPi.org..."
 twine upload dist/*
 echo "上传完成"
 rm -rf dist
-version=`python setup.py --version`
-echo "版本号: ${version}"
-echo "git 代码打tag"
-git tag -a v$version -m "Release version ${version}"
-git push --tags
+#version=`python setup.py --version`
+#echo "版本号: ${version}"
+#echo "git 代码打tag"
+#git tag -a v$version -m "Release version ${version}"
+#git push --tags
 cd $p0
