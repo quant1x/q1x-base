@@ -3,8 +3,6 @@ import sys
 
 from git import Repo
 
-from base.path import project_path
-
 
 def project_version(incr: bool = False) -> str:
     """
@@ -12,7 +10,8 @@ def project_version(incr: bool = False) -> str:
     :param incr:
     :return:
     """
-    path = project_path()
+    # path = project_path()
+    path = r'./'
     repo = Repo(path)
     tags = []
     for __tag in repo.tags:
