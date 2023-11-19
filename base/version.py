@@ -3,7 +3,7 @@ import sys
 
 from git import Repo
 
-from quant1x.base.path import project_path
+from base.path import project_path
 
 
 def project_version(incr: bool = False) -> str:
