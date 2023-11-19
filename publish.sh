@@ -14,7 +14,7 @@ echo "打包完成"
 echo "正在上传PyPi.org..."
 twine upload dist/*
 echo "上传完成"
-rm -rf dist
+rm -rf dist build *.egg-info
 #version=`python setup.py --version`
 #echo "版本号: ${version}"
 #echo "git 代码打tag"
