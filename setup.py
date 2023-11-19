@@ -3,7 +3,7 @@
 """The setup script."""
 import setuptools
 
-from base.version import project_version
+from base1x.version import project_version
 
 # from quant1x import __author__
 
@@ -40,7 +40,7 @@ setuptools.setup(
     version=app__version__,
     author=__author__,
     long_description=readme,
-    packages=setuptools.find_packages(include=["base", "base.*"]),
+    packages=setuptools.find_packages(include=["base1x", "base1x.*"]),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
