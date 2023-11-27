@@ -21,10 +21,12 @@ def parse_requirements(filename):
     return [line for line in line_iter if line and not line.startswith("#")]
 
 
-with open("README.rst", encoding="utf-8") as readme_file:
+# 加载README信息
+with open("README.md", encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst", encoding="utf-8") as history_file:
+# 加载ChangeLog
+with open("CHANGELOG.md", encoding="utf-8") as history_file:
     history = history_file.read()
 
 requirements = parse_requirements("requirements.txt")
