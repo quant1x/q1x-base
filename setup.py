@@ -3,19 +3,17 @@
 """The setup script."""
 import setuptools
 
-from base1x.version import project_version
+from base1x import __author__
+from base1x import project_version
 
-# from quant1x import __author__
-
-# try:
-#     from setuptools import find_packages, setup
-# except ImportError:
-#     from distutils.core import find_packages, setup
+try:
+    from setuptools import find_packages, setup
+except ImportError:
+    from distutils.core import find_packages, setup
 
 latest = project_version()
 
 app__version__ = latest
-__author__ = "WangFeng"
 
 
 def parse_requirements(filename):

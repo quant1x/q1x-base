@@ -6,7 +6,8 @@ from git import Repo
 
 def project_version(incr: bool = False) -> str:
     """
-    获取项目版本号
+    获取项目版本号, 取自git的tag
+    这个函数不能在发行后运行, 只能用于打包时自动检测最新的tag作为版本号
     :param incr:
     :return:
     """
