@@ -1,8 +1,10 @@
 # -*- coding: UTF-8 -*-
-import sys
 from ipaddress import IPv4Address
 
+# 代表所有可能的被访问的地址
 UNSAFE_ADDRESS = '0.0.0.0'
+# 本机回环地址
+LOOPBACK_ADDRESS = '127.0.0.1'
 
 
 def ip_is_private(ip: str = '127.0.0.1') -> bool:
@@ -28,6 +30,23 @@ def ip_is_secure(ip: str = UNSAFE_ADDRESS) -> bool:
         return ip_is_private(ip)
 
 
+def get_lan_address() -> str:
+    """
+    获取本机的局域网IP地址, 非回环地址127.0.0.1
+    :return:
+    """
+    import socket
+    global s
+    _ip = LOOPBACK_ADDRESS
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        _ip, _port = s.getsockname()
+    finally:
+        s.close()
+    return _ip
+
+
 if __name__ == '__main__':
     ip = "192.168.0.1"
     print(ip_is_secure(ip))
@@ -37,4 +56,4 @@ if __name__ == '__main__':
     print(ip_is_secure(ip))
     ip = "127.0.0.1"
     print(ip_is_secure(ip))
-    sys.exit(0)
+    print(get_lan_address())
