@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.8] - 2023-11-28
+### Changed
+- 增加获取本机局域网ip地址的函数.
+
 ## [0.1.7] - 2023-11-28
 ### Changed
 - 新增IPv4地址检测功能, 总的原则是内网安全, 外网不安全.
@@ -45,8 +49,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.7...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.8...HEAD
 
+[0.1.8]: https://gitee.com/quant1x/base/compare/v0.1.7...v0.1.8
 [0.1.7]: https://gitee.com/quant1x/base/compare/v0.1.6...v0.1.7
 [0.1.6]: https://gitee.com/quant1x/base/compare/v0.1.5...v0.1.6
 [0.1.5]: https://gitee.com/quant1x/base/compare/v0.1.4...v0.1.5
