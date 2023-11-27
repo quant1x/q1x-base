@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.5] - 2023-11-28
+### Changed
+- 增加单例模式, 时间范围, 交易时段.
+
 ## [0.1.4] - 2023-11-20
 ### Changed
 - 获取项目路径增加默认路径.
@@ -31,8 +35,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.4...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.5...HEAD
 
+[0.1.5]: https://gitee.com/quant1x/base/compare/v0.1.4...v0.1.5
 [0.1.4]: https://gitee.com/quant1x/base/compare/v0.1.3...v0.1.4
 [0.1.3]: https://gitee.com/quant1x/base/compare/v0.1.2...v0.1.3
 [0.1.2]: https://gitee.com/quant1x/base/compare/v0.1.1...v0.1.2
