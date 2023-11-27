@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.7] - 2023-11-28
+### Changed
+- 新增IPv4地址检测功能, 总的原则是内网安全, 外网不安全.
+
 ## [0.1.6] - 2023-11-28
 ### Changed
 - 调整打包配置, 删除rst格式的文档.
@@ -41,8 +45,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.7...HEAD
 
+[0.1.7]: https://gitee.com/quant1x/base/compare/v0.1.6...v0.1.7
 [0.1.6]: https://gitee.com/quant1x/base/compare/v0.1.5...v0.1.6
 [0.1.5]: https://gitee.com/quant1x/base/compare/v0.1.4...v0.1.5
 [0.1.4]: https://gitee.com/quant1x/base/compare/v0.1.3...v0.1.4
