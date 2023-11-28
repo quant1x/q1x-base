@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-11-29
+### Changed
+- 调整get_lan_address函数名, 去掉前面的get_前缀.
+
 ## [0.1.9] - 2023-11-28
 ### Changed
 - 增加cpu核数的相关函数.
@@ -53,8 +57,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.1.9...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.0...HEAD
 
+[0.2.0]: https://gitee.com/quant1x/base/compare/v0.1.9...v0.2.0
 [0.1.9]: https://gitee.com/quant1x/base/compare/v0.1.8...v0.1.9
 [0.1.8]: https://gitee.com/quant1x/base/compare/v0.1.7...v0.1.8
 [0.1.7]: https://gitee.com/quant1x/base/compare/v0.1.6...v0.1.7
