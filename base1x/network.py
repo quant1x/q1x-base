@@ -30,7 +30,7 @@ def ip_is_secure(ip: str = UNSAFE_ADDRESS) -> bool:
         return ip_is_private(ip)
 
 
-def get_lan_address() -> str:
+def lan_address() -> str:
     """
     获取本机的局域网IP地址, 非回环地址127.0.0.1
     :return:
@@ -56,4 +56,4 @@ if __name__ == '__main__':
     print(ip_is_secure(ip))
     ip = "127.0.0.1"
     print(ip_is_secure(ip))
-    print(get_lan_address())
+    print(lan_address())
