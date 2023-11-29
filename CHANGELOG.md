@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.3] - 2023-11-30
+### Changed
+- 修复路径可能存在非项目本地文件路径的问题.
+
 ## [0.2.2] - 2023-11-30
 ### Changed
 - 调整简化引入的路径.
@@ -71,8 +75,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.2...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.3...HEAD
 
+[0.2.3]: https://gitee.com/quant1x/base/compare/v0.2.2...v0.2.3
 [0.2.2]: https://gitee.com/quant1x/base/compare/v0.2.1...v0.2.2
 [0.2.1]: https://gitee.com/quant1x/base/compare/v0.2.0...v0.2.1
 [0.2.0]: https://gitee.com/quant1x/base/compare/v0.1.9...v0.2.0
