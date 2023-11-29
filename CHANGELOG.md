@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.2] - 2023-11-30
+### Changed
+- 调整简化引入的路径.
+- 调整时间格式常量名.
+- 调整datetime常量.
+- 源文件名path.py不准确, 其实际作为开发时的python检索路径的前置处理.
+- 新增: file类函数.
+- 新增: num类函数.
+- 新增: 设计模式.
+
 ## [0.2.1] - 2023-11-29
 ### Changed
 - 简化path的函数引用路径.
@@ -61,8 +71,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.2...HEAD
 
+[0.2.2]: https://gitee.com/quant1x/base/compare/v0.2.1...v0.2.2
 [0.2.1]: https://gitee.com/quant1x/base/compare/v0.2.0...v0.2.1
 [0.2.0]: https://gitee.com/quant1x/base/compare/v0.1.9...v0.2.0
 [0.1.9]: https://gitee.com/quant1x/base/compare/v0.1.8...v0.1.9
