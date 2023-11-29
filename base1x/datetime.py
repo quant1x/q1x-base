@@ -1,29 +1,29 @@
 # -*- coding: UTF-8 -*-
 import re
-import threading
 import time
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List
 
-TIME_FORMAT_TIMESTAMP = '%H:%M:%S'
+# 仅日期格式: 2022-11-28
+FORMAT_ONLY_DATE = '%Y-%m-%d'
+# 仅时间格式: 09:15:59
+FORMAT_ONLY_TIME = '%H:%M:%S'
+# 文件名中包含日期的日期格式: 20221128
+FORMAT_FILE_DATE = '%Y%m%d'
+# 时间戳: 2022-11-28 09:15:59
+FORMAT_TIMESTAMP = '%Y-%m-%d %H:%M:%S'
+# 时间戳带毫秒数, 如果毫秒数保留前3位, 需要自己截取: 2022-11-28 09:15:59.123456
+FORMAT_TIMESTAMP_WITH_MILLISECOND = '%Y-%m-%d %H:%M:%S.%f'
 
 
-class Singleton:
+def seconds_to_timestamp(x: int):
     """
-    线程安全的单例模式
+    秒数转时间戳字符串
+    :param x:
+    :return:
     """
-    _instance = None
-    _lock = threading.Lock()
-
-    def __new__(cls, *args, **kwargs):
-        with cls._lock:
-            if not cls._instance:
-                # cls._instance = super().__new__(cls, *args, **kwargs)
-                cls._instance = super().__new__(cls)
-        return cls._instance
-
-    def __init__(self):
-        pass
+    return time.strftime(FORMAT_TIMESTAMP, time.localtime(x))
 
 
 @dataclass
@@ -37,8 +37,8 @@ class TimeRange(object):
     def __init__(self, time_range: str):
         """
         构造
-        :param time_range: 
-        :return: 
+        :param time_range:
+        :return:
         """
         self.begin = ''
         self.end = ''
@@ -62,7 +62,7 @@ class TimeRange(object):
         """
         timestamp = timestamp.strip()
         if len(timestamp) == 0:
-            timestamp = time.strftime(TIME_FORMAT_TIMESTAMP)
+            timestamp = time.strftime(FORMAT_ONLY_TIME)
         if self.begin <= timestamp <= self.end:
             return True
         return False
@@ -109,7 +109,7 @@ class TradingSession:
         """
         timestamp = timestamp.strip()
         if len(timestamp) == 0:
-            timestamp = time.strftime(TIME_FORMAT_TIMESTAMP)
+            timestamp = time.strftime(FORMAT_ONLY_TIME)
         for item in self.sessions:
             v = item
             if v.is_trading(timestamp):
@@ -128,6 +128,11 @@ class TradingSession:
 
 
 if __name__ == '__main__':
+    dt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    dt_ms = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    print(dt)
+    print(dt_ms)
+
     time_range = " 09:30:00 ~ 14:56:30 "
     time_range = " 14:56:30 - 09:30:00 "
     tr = TimeRange(time_range)
