@@ -11,9 +11,10 @@ try:
 except ImportError:
     from distutils.core import find_packages, setup
 
-latest = project_version()
+latest, author = project_version()
 
-app__version__ = latest
+__app_version__ = latest
+__app_author__ = __author__
 
 
 def parse_requirements(filename):
@@ -37,8 +38,8 @@ setuptools.setup(
     description="Quant1X量化系统python基础库",
     author_email="wangfengxy@sina.cn",
     url="https://gitee.com/quant1x/base",
-    version=app__version__,
-    author=__author__,
+    version=__app_version__,
+    author=__app_author__,
     long_description=readme,
     packages=setuptools.find_packages(include=["base1x", "base1x.*"]),
     include_package_data=True,
