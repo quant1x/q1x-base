@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.4] - 2023-11-30
+### Changed
+- 调整简化引入路径.
+- 修改源文件名, datetime.py导致引入datetime失败.
+- 新增.git路径检测机制.
+
 ## [0.2.3] - 2023-11-30
 ### Changed
 - 修复路径可能存在非项目本地文件路径的问题.
@@ -75,8 +81,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.3...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.4...HEAD
 
+[0.2.4]: https://gitee.com/quant1x/base/compare/v0.2.3...v0.2.4
 [0.2.3]: https://gitee.com/quant1x/base/compare/v0.2.2...v0.2.3
 [0.2.2]: https://gitee.com/quant1x/base/compare/v0.2.1...v0.2.2
 [0.2.1]: https://gitee.com/quant1x/base/compare/v0.2.0...v0.2.1
