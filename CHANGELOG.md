@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.9] - 2023-11-30
+### Changed
+- 增加二级市场函数-证券代码.
+
 ## [0.2.8] - 2023-11-30
 ### Changed
 - 简化引入路径增加秒数转时间戳字符串的函数.
@@ -97,8 +101,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.8...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.9...HEAD
 
+[0.2.9]: https://gitee.com/quant1x/base/compare/v0.2.8...v0.2.9
 [0.2.8]: https://gitee.com/quant1x/base/compare/v0.2.7...v0.2.8
 [0.2.7]: https://gitee.com/quant1x/base/compare/v0.2.6...v0.2.7
 [0.2.6]: https://gitee.com/quant1x/base/compare/v0.2.5...v0.2.6
