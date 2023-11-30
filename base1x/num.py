@@ -14,9 +14,9 @@ def is_nan(n) -> bool:
     return np.isnan(n) or np.isinf(n)
 
 
-def price_round(num: float, digits: int = 2) -> float:
+def float_round(num: float, digits: int = 2) -> float:
     """
-    价格四舍五入
+    浮点四舍五入
     :param num:
     :param digits: 小数点后几位数字, 默认两位
     :return:
