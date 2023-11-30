@@ -22,3 +22,18 @@ def touch(filename: str):
     mkdirs(directory)
     with open(filename, 'w') as done_file:
         pass
+
+
+def homedir() -> str:
+    """
+    获取宿主目录
+    首先会获取环境变量GOX_HOME, 如果不存在则用~
+    :return:
+    """
+    gox_home = os.getenv("GOX_HOME", '')
+    gox_home = gox_home.strip()
+    if len(gox_home) == 0:
+        user_home = '~'
+    else:
+        user_home = gox_home
+    return user_home
