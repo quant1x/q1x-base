@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.8] - 2023-11-30
+### Changed
+- 简化引入路径增加秒数转时间戳字符串的函数.
+
 ## [0.2.7] - 2023-11-30
 ### Changed
 - 增加日志工具.
@@ -93,8 +97,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.7...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.8...HEAD
 
+[0.2.8]: https://gitee.com/quant1x/base/compare/v0.2.7...v0.2.8
 [0.2.7]: https://gitee.com/quant1x/base/compare/v0.2.6...v0.2.7
 [0.2.6]: https://gitee.com/quant1x/base/compare/v0.2.5...v0.2.6
 [0.2.5]: https://gitee.com/quant1x/base/compare/v0.2.4...v0.2.5
