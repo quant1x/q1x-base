@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.6] - 2023-11-30
+### Changed
+- 修改浮点四舍五入的函数名.
+
 ## [0.2.5] - 2023-11-30
 ### Changed
 - 修改浮点四舍五入的函数名.
@@ -85,8 +89,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.5...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.2.6...HEAD
 
+[0.2.6]: https://gitee.com/quant1x/base/compare/v0.2.5...v0.2.6
 [0.2.5]: https://gitee.com/quant1x/base/compare/v0.2.4...v0.2.5
 [0.2.4]: https://gitee.com/quant1x/base/compare/v0.2.3...v0.2.4
 [0.2.3]: https://gitee.com/quant1x/base/compare/v0.2.2...v0.2.3
