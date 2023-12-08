@@ -11,4 +11,3 @@ from .num import is_nan, float_round, fix_float
 from .pattern import Singleton
 from .timestamp import TimeRange, FORMAT_DATETIME
 from .timestamp import TradingSession, seconds_to_timestamp
-from .version import project_version

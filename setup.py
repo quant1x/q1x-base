@@ -4,7 +4,7 @@
 import setuptools
 
 from base1x import __author__
-from base1x import project_version
+from base1x.version import project_version
 
 try:
     from setuptools import find_packages, setup
