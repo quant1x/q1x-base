@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.1] - 2023-12-08
+### Changed
+- 去掉init中git相关的函数.
+
 ## [0.3.0] - 2023-12-01
 ### Changed
 - 增加获取用户宿主目录的函数homedir.
@@ -105,8 +109,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.0...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.1...HEAD
 
+[0.3.1]: https://gitee.com/quant1x/base/compare/v0.3.0...v0.3.1
 [0.3.0]: https://gitee.com/quant1x/base/compare/v0.2.9...v0.3.0
 [0.2.9]: https://gitee.com/quant1x/base/compare/v0.2.8...v0.2.9
 [0.2.8]: https://gitee.com/quant1x/base/compare/v0.2.7...v0.2.8
