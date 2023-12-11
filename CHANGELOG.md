@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.2] - 2023-12-11
+### Changed
+- 拟增加yaml配置文件的自动装载功能.
+- 调整依赖包.
+
 ## [0.3.1] - 2023-12-08
 ### Changed
 - 去掉init中git相关的函数.
@@ -109,8 +114,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.2...HEAD
 
+[0.3.2]: https://gitee.com/quant1x/base/compare/v0.3.1...v0.3.2
 [0.3.1]: https://gitee.com/quant1x/base/compare/v0.3.0...v0.3.1
 [0.3.0]: https://gitee.com/quant1x/base/compare/v0.2.9...v0.3.0
 [0.2.9]: https://gitee.com/quant1x/base/compare/v0.2.8...v0.2.9
