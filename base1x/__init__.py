@@ -2,6 +2,7 @@
 
 __author__ = 'WangFeng'
 
+from .application import application
 from .device import cpu_num, max_procs
 from .devp import project_path, redirect
 from .file import mkdirs, touch, homedir
