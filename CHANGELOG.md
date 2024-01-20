@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.4] - 2024-01-20
+### Changed
+- 修订日志模块, 作为默认的日志记录器.
+- !2 根据app名字初始化logger Merge pull request !2 from heathen666/master.
+- 根据app名字初始化logger.
+
 ## [0.3.3] - 2024-01-10
 ### Changed
 - 增加获取应用程序信息的功能.
@@ -118,8 +124,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.3...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.4...HEAD
 
+[0.3.4]: https://gitee.com/quant1x/base/compare/v0.3.3...v0.3.4
 [0.3.3]: https://gitee.com/quant1x/base/compare/v0.3.2...v0.3.3
 [0.3.2]: https://gitee.com/quant1x/base/compare/v0.3.1...v0.3.2
 [0.3.1]: https://gitee.com/quant1x/base/compare/v0.3.0...v0.3.1
