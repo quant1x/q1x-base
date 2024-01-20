@@ -1,9 +1,20 @@
 # -*- coding: UTF-8 -*-
+import os.path
+
 from loguru import logger as __logger
 
-from .application import application
-splitted_app_path = application()
-log_file = f"{splitted_app_path[0]}/{splitted_app_path[1]}.log"
+import application as app
+import file
+
+__user_home = file.homedir()
+__user_home = os.path.expanduser(__user_home)
+__logger_path = os.path.join(__user_home, ".quant1x", "logs")
+
+_, filename, _ = app.application()
+log_file = f"{__logger_path}/{filename}.log"
 __logger.add(log_file, rotation="00:00", retention="10 days")
 
 logger = __logger
+
+if __name__ == '__main__':
+    logger.warning("test")
