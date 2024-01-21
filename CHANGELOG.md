@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.7] - 2024-01-21
+### Changed
+- 如果是服务, 引用base1x.logger则用quant1x作为日志文件名.
+
 ## [0.3.6] - 2024-01-21
 ### Changed
 - 修订用户宿主目录, 如果是~直接转换绝对路径.
@@ -132,8 +136,9 @@ All notable changes to this project will be documented in this file.
 - Add LICENSE.
 - Initial commit.
 
-[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/base/compare/v0.3.7...HEAD
 
+[0.3.7]: https://gitee.com/quant1x/base/compare/v0.3.6...v0.3.7
 [0.3.6]: https://gitee.com/quant1x/base/compare/v0.3.5...v0.3.6
 [0.3.5]: https://gitee.com/quant1x/base/compare/v0.3.4...v0.3.5
 [0.3.4]: https://gitee.com/quant1x/base/compare/v0.3.3...v0.3.4
