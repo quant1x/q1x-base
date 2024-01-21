@@ -33,7 +33,8 @@ def homedir() -> str:
     gox_home = os.getenv("GOX_HOME", '')
     gox_home = gox_home.strip()
     if len(gox_home) == 0:
-        user_home = '~'
+        user_home = os.path.expanduser('~')
     else:
         user_home = gox_home
     return user_home
+
