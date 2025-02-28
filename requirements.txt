@@ -9,4 +9,4 @@ icecream~=2.1.4
 # 3. configure
 PyYAML~=6.0.2
 # 4. number
-numpy~=2.2.3
+numpy~=1.26.4
