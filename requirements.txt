@@ -1,12 +1,12 @@
-# 1. 工程构建依赖: setuptools, twine, wheel
+# 1. project build tools: setuptools, twine, wheel
 setuptools~=75.8.2
 twine==6.1.0
 wheel==0.45.1
 requests-toolbelt==1.0.0
-# 2. 日志
+# 2. logger
 loguru~=0.7.3
 icecream~=2.1.4
-# 3. 配置
+# 3. configure
 PyYAML~=6.0.2
-# 4. 科学计算
+# 4. number
 numpy~=2.2.3
