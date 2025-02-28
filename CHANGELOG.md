@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-02-28
+### Changed
+- 去掉中文注释
+- 增加gitignore
+
 ## [0.5.0] - 2025-02-28
 ### Changed
 - 更新依赖库版本
+- update changelog
 
 ## [0.4.2] - 2024-04-25
 ### Changed
@@ -194,7 +200,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.0...HEAD
+[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.1...HEAD
+[0.5.1]: https://gitee.com/quant1x/base.git/compare/v0.5.0...v0.5.1
 [0.5.0]: https://gitee.com/quant1x/base.git/compare/v0.4.2...v0.5.0
 [0.4.2]: https://gitee.com/quant1x/base.git/compare/v0.4.1...v0.4.2
 [0.4.1]: https://gitee.com/quant1x/base.git/compare/v0.4.0...v0.4.1
