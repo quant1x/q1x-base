@@ -1,5 +1,5 @@
 # 1. project build tools: setuptools, twine, wheel
-setuptools~=75.8.2
+setuptools~=70.0.0
 twine==6.1.0
 wheel==0.45.1
 requests-toolbelt==1.0.0
