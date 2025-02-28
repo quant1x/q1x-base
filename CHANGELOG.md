@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.2] - 2025-02-28
+### Changed
+- 回退numpy版本到1.26.4
+
 ## [0.5.1] - 2025-02-28
 ### Changed
 - 去掉中文注释
 - 增加gitignore
+- update changelog
 
 ## [0.5.0] - 2025-02-28
 ### Changed
@@ -200,7 +205,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.2...HEAD
+[0.5.2]: https://gitee.com/quant1x/base.git/compare/v0.5.1...v0.5.2
 [0.5.1]: https://gitee.com/quant1x/base.git/compare/v0.5.0...v0.5.1
 [0.5.0]: https://gitee.com/quant1x/base.git/compare/v0.4.2...v0.5.0
 [0.4.2]: https://gitee.com/quant1x/base.git/compare/v0.4.1...v0.4.2
