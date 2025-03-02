@@ -10,3 +10,5 @@ icecream~=2.1.4
 PyYAML~=6.0.2
 # 4. number
 numpy~=1.26.4
+# 5. git
+gitpython~=3.1.44
