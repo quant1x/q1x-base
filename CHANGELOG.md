@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.6] - 2025-03-07
+### Changed
+- 调整部分依赖库版本为兼容
+
 ## [0.5.5] - 2025-03-02
 ### Changed
 - 增加对gitpython的依赖
+- update changelog
 
 ## [0.5.4] - 2025-03-02
 ### Changed
@@ -221,7 +226,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.5...HEAD
+[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.6...HEAD
+[0.5.6]: https://gitee.com/quant1x/base.git/compare/v0.5.5...v0.5.6
 [0.5.5]: https://gitee.com/quant1x/base.git/compare/v0.5.4...v0.5.5
 [0.5.4]: https://gitee.com/quant1x/base.git/compare/v0.5.3...v0.5.4
 [0.5.3]: https://gitee.com/quant1x/base.git/compare/v0.5.2...v0.5.3
