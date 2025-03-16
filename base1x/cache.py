@@ -3,11 +3,12 @@
 import os
 
 import pandas as pd
-from pandas import DataFrame
+import yaml
+from functools import lru_cache
 
 from base1x import exchange
 from base1x import file
-import yaml
+
 
 def get_quant1x_config_filename() -> str:
     """
@@ -44,6 +45,12 @@ config_filename = get_quant1x_config_filename()
 # 加载配置文件
 config = load_config(config_filename)
 
+# quant1x在宿主目录的路径
+quant1x_main_path = os.path.expanduser('~')
+if quant1x_main_path == quant1x_home:
+    quant1x_main_path = os.path.join(quant1x_main_path, '.quant1x')
+# 元数据路径
+quant1x_data_meta = os.path.join(quant1x_main_path, 'meta')
 # 读取basedir配置
 basedir = config['basedir'].strip()
 # 如果basedir配置无效, 则默认使用{$quant1x_home}/data
@@ -53,25 +60,62 @@ if len(basedir) == 0:
 # 日线数据路径
 quant1x_data_day = os.path.join(basedir, 'day')
 
-def klines(code: str) -> DataFrame | None:
+@lru_cache(maxsize=None)
+def securities() -> pd.DataFrame:
+    """
+    证券列表
+    """
+    full_path = os.path.join(quant1x_data_meta, 'securities.csv')
+    if not os.path.isfile(full_path):
+        return pd.DataFrame()
+    df = pd.read_csv(full_path)
+    # 转换为小写
+    df.columns = df.columns.str.lower()
+    return df[['code','name']]
+
+@lru_cache(maxsize=None)
+def block_list():
+    """
+    板块列表
+    """
+    df = securities()
+    return df[df['code'].astype(str).str.startswith('sh880','sh881')]
+
+
+def stock_name(code: str) -> str:
+    corrected_symbol = exchange.correct_security_code(code)
+    df = securities()
+    tmp = df[df['code']==corrected_symbol]
+    name = tmp['name'].iloc[0]
+    return name
+
+
+def klines(code: str) -> pd.DataFrame | None:
     """
     获取缓存的日线数据
     """
-    symbol = exchange.correct_security_code(code)
-    endlenth = 3
-    filepath = os.path.join(quant1x_data_day, symbol[:-endlenth])
-    ext = '.csv'
-    name = symbol + ext
-    filename = os.path.join(filepath, name)
-    if os.path.isfile(filename):
-        df = pd.read_csv(filename)
-        return df
-    else:
-        return None
+    corrected_symbol = exchange.correct_security_code(code)
+    suffix_length = 3  # 修正拼写并明确表示后缀长度
+    symbol_directory = os.path.join(quant1x_data_day, corrected_symbol[:-suffix_length])  # 更清晰表达目录用途
+    file_extension = '.csv'
+    filename = f"{corrected_symbol}{file_extension}"  # 使用f-string格式化
+    full_path = os.path.join(symbol_directory, filename)
+
+    if os.path.isfile(full_path):
+        return pd.read_csv(full_path)
+    return None
 
 if __name__ == '__main__':
     print(get_quant1x_config_filename())
     print('basedir', basedir)
     print('quant1x_data_day', quant1x_data_day)
-    df = klines('600600')
+    code = '600600'
+    df = klines(code)
     print(df)
+    stock_name = stock_name(code)
+    print(stock_name)
+    security_list = securities()
+    print(security_list)
+    index_list = block_list()
+    print(index_list)
+
