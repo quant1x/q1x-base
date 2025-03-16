@@ -8,7 +8,8 @@ loguru~=0.7.3
 icecream~=2.1.4
 # 3. configure
 PyYAML~=6.0.2
-# 4. number
+# 4. num & dataframe
 numpy~=1.26.4
+pandas~=2.2.3
 # 5. git
 gitpython~=3.1.44
