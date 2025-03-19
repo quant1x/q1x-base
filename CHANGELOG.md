@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.9] - 2025-03-19
+### Changed
+- 新增获取板块相关函数
+
 ## [0.5.8] - 2025-03-17
 ### Changed
 - 依赖库增加pandas
 - 新增证券代码列表和板块列表函数
+- update changelog
 
 ## [0.5.7] - 2025-03-07
 ### Changed
@@ -239,7 +244,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.8...HEAD
+[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.9...HEAD
+[0.5.9]: https://gitee.com/quant1x/base.git/compare/v0.5.8...v0.5.9
 [0.5.8]: https://gitee.com/quant1x/base.git/compare/v0.5.7...v0.5.8
 [0.5.7]: https://gitee.com/quant1x/base.git/compare/v0.5.6...v0.5.7
 [0.5.6]: https://gitee.com/quant1x/base.git/compare/v0.5.5...v0.5.6
