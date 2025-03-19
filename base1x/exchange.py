@@ -1,5 +1,12 @@
 # -*- coding: UTF-8 -*-
+import time
 from enum import Enum
+from functools import lru_cache
+
+import pandas
+
+import base1x
+from base1x.base import *
 
 
 class MarketType(Enum):
@@ -172,6 +179,69 @@ def assert_code(security_code: str) -> TargetKind:
     return TargetKind.STOCK
 
 
+exchange_start_time = '09:15:00'
+exchange_end_time = '15:00:00'
+# time_range = "09:15:00~11:30:00,13:00:00~15:00:00"
+trade_session = base1x.timestamp.TimeRange(f'{exchange_start_time}~{exchange_end_time}')
+
+
+@lru_cache(maxsize=None)
+def __calendar() -> pandas.Series:
+    """
+    交易日历
+    """
+    fn = os.path.join(quant1x_data_meta, "calendar")
+    df = pandas.read_csv(fn)
+    return df['date']
+
+
+def get_today() -> str:
+    """
+    获取当前日期
+    """
+    date = time.strftime(base1x.timestamp.FORMAT_ONLY_DATE)
+    return date
+
+
+def is_session_pre() -> bool:
+    """
+    是否盘前
+    """
+    now = time.strftime(base1x.timestamp.FORMAT_ONLY_TIME)
+    return now < exchange_start_time
+
+
+def is_session_reg() -> bool:
+    """
+    是否盘中
+    """
+    now = time.strftime(base1x.timestamp.FORMAT_ONLY_TIME)
+    return trade_session.is_trading(now)
+
+
+def is_session_post() -> bool:
+    """
+    是否盘后
+    """
+    now = time.strftime(base1x.timestamp.FORMAT_ONLY_TIME)
+    return now > exchange_end_time
+
+
+def last_trade_date() -> str:
+    """
+    获取最近的一个交易日
+    """
+    list = __calendar()
+    today = get_today()
+    session_pre = trade_session.is_session_pre()
+    idx = list.searchsorted(today)
+    date = list[idx]
+    # 如果在今日之后, 那么今天是节假日, 则取前一个交易日, 如果在盘前, 今天的数据没生成, 则取前一个交易日
+    if date > today or (date == today and session_pre):
+        date = list[idx - 1]
+    return date
+
+
 if __name__ == '__main__':
     # 获取市场代码
     print(get_market("600519"))  # 输出: sh
@@ -184,3 +254,9 @@ if __name__ == '__main__':
     print(assert_code("sh000001"))  # TargetKind.INDEX
     print(assert_code("sz399001"))  # TargetKind.INDEX
     print(assert_code("sh510500"))  # TargetKind.ETF
+
+    a1 = last_trade_date()
+    print(type(a1))
+    print(a1)
+    d1 = last_trade_date()
+    print(d1)

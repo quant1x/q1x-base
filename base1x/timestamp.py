@@ -29,7 +29,7 @@ def seconds_to_timestamp(x: int):
 @dataclass
 class TimeRange(object):
     """
-    时间范围
+    时间范围, 用~或-间隔HH-MM-SS
     """
     begin: str
     end: str
@@ -57,7 +57,7 @@ class TimeRange(object):
     def is_trading(self, timestamp: str = "") -> bool:
         """
         是否交易中
-        :param timestamp:
+        :param timestamp: %H:%M:%S
         :return:
         """
         timestamp = timestamp.strip()
@@ -73,6 +73,36 @@ class TimeRange(object):
         :return:
         """
         return self.begin != '' and self.end != ''
+
+    def is_session_pre(self, timestamp: str = "") -> bool:
+        """
+        是否盘前
+        :param timestamp: %H:%M:%S
+        """
+        timestamp = timestamp.strip()
+        if len(timestamp) == 0:
+            timestamp = time.strftime(FORMAT_ONLY_TIME)
+        return timestamp < self.begin
+
+    def is_session_reg(self, timestamp: str = "") -> bool:
+        """
+        是否盘中
+        :param timestamp: %H:%M:%S
+        """
+        timestamp = timestamp.strip()
+        if len(timestamp) == 0:
+            timestamp = time.strftime(FORMAT_ONLY_TIME)
+        return self.is_trading(timestamp)
+
+    def is_session_post(self, timestamp: str = "") -> bool:
+        """
+        是否盘后
+        :param timestamp: %H:%M:%S
+        """
+        timestamp = timestamp.strip()
+        if len(timestamp) == 0:
+            timestamp = time.strftime(FORMAT_ONLY_TIME)
+        return timestamp > self.end
 
 
 @dataclass
@@ -94,12 +124,6 @@ class TradingSession:
             v = v.strip()
             r = TimeRange(v)
             self.sessions.append(r)
-
-    # def __str__(self):
-    #     sb = []
-    #     for v in self.sessions:
-    #         sb.append(v)
-    #     return sb.__str__()
 
     def is_trading(self, timestamp: str = "") -> bool:
         """
