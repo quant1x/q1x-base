@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.11] - 2025-06-20
+### Changed
+- 调整顶层package
+
 ## [0.5.10] - 2025-06-20
 ### Changed
 - 支持python3.12
 - 明确导入模块
+- update changelog
 
 ## [0.5.9] - 2025-03-19
 ### Changed
@@ -250,49 +255,50 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/base.git/compare/v0.5.10...HEAD
-[0.5.10]: https://gitee.com/quant1x/base.git/compare/v0.5.9...v0.5.10
-[0.5.9]: https://gitee.com/quant1x/base.git/compare/v0.5.8...v0.5.9
-[0.5.8]: https://gitee.com/quant1x/base.git/compare/v0.5.7...v0.5.8
-[0.5.7]: https://gitee.com/quant1x/base.git/compare/v0.5.6...v0.5.7
-[0.5.6]: https://gitee.com/quant1x/base.git/compare/v0.5.5...v0.5.6
-[0.5.5]: https://gitee.com/quant1x/base.git/compare/v0.5.4...v0.5.5
-[0.5.4]: https://gitee.com/quant1x/base.git/compare/v0.5.3...v0.5.4
-[0.5.3]: https://gitee.com/quant1x/base.git/compare/v0.5.2...v0.5.3
-[0.5.2]: https://gitee.com/quant1x/base.git/compare/v0.5.1...v0.5.2
-[0.5.1]: https://gitee.com/quant1x/base.git/compare/v0.5.0...v0.5.1
-[0.5.0]: https://gitee.com/quant1x/base.git/compare/v0.4.2...v0.5.0
-[0.4.2]: https://gitee.com/quant1x/base.git/compare/v0.4.1...v0.4.2
-[0.4.1]: https://gitee.com/quant1x/base.git/compare/v0.4.0...v0.4.1
-[0.4.0]: https://gitee.com/quant1x/base.git/compare/v0.3.9...v0.4.0
-[0.3.9]: https://gitee.com/quant1x/base.git/compare/v0.3.8...v0.3.9
-[0.3.8]: https://gitee.com/quant1x/base.git/compare/v0.3.7...v0.3.8
-[0.3.7]: https://gitee.com/quant1x/base.git/compare/v0.3.6...v0.3.7
-[0.3.6]: https://gitee.com/quant1x/base.git/compare/v0.3.5...v0.3.6
-[0.3.5]: https://gitee.com/quant1x/base.git/compare/v0.3.4...v0.3.5
-[0.3.4]: https://gitee.com/quant1x/base.git/compare/v0.3.3...v0.3.4
-[0.3.3]: https://gitee.com/quant1x/base.git/compare/v0.3.2...v0.3.3
-[0.3.2]: https://gitee.com/quant1x/base.git/compare/v0.3.1...v0.3.2
-[0.3.1]: https://gitee.com/quant1x/base.git/compare/v0.3.0...v0.3.1
-[0.3.0]: https://gitee.com/quant1x/base.git/compare/v0.2.9...v0.3.0
-[0.2.9]: https://gitee.com/quant1x/base.git/compare/v0.2.8...v0.2.9
-[0.2.8]: https://gitee.com/quant1x/base.git/compare/v0.2.7...v0.2.8
-[0.2.7]: https://gitee.com/quant1x/base.git/compare/v0.2.6...v0.2.7
-[0.2.6]: https://gitee.com/quant1x/base.git/compare/v0.2.5...v0.2.6
-[0.2.5]: https://gitee.com/quant1x/base.git/compare/v0.2.4...v0.2.5
-[0.2.4]: https://gitee.com/quant1x/base.git/compare/v0.2.3...v0.2.4
-[0.2.3]: https://gitee.com/quant1x/base.git/compare/v0.2.2...v0.2.3
-[0.2.2]: https://gitee.com/quant1x/base.git/compare/v0.2.1...v0.2.2
-[0.2.1]: https://gitee.com/quant1x/base.git/compare/v0.2.0...v0.2.1
-[0.2.0]: https://gitee.com/quant1x/base.git/compare/v0.1.9...v0.2.0
-[0.1.9]: https://gitee.com/quant1x/base.git/compare/v0.1.8...v0.1.9
-[0.1.8]: https://gitee.com/quant1x/base.git/compare/v0.1.7...v0.1.8
-[0.1.7]: https://gitee.com/quant1x/base.git/compare/v0.1.6...v0.1.7
-[0.1.6]: https://gitee.com/quant1x/base.git/compare/v0.1.5...v0.1.6
-[0.1.5]: https://gitee.com/quant1x/base.git/compare/v0.1.4...v0.1.5
-[0.1.4]: https://gitee.com/quant1x/base.git/compare/v0.1.3...v0.1.4
-[0.1.3]: https://gitee.com/quant1x/base.git/compare/v0.1.2...v0.1.3
-[0.1.2]: https://gitee.com/quant1x/base.git/compare/v0.1.1...v0.1.2
-[0.1.1]: https://gitee.com/quant1x/base.git/compare/v0.1.0...v0.1.1
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.11...HEAD
+[0.5.11]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.10...v0.5.11
+[0.5.10]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.9...v0.5.10
+[0.5.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.8...v0.5.9
+[0.5.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.7...v0.5.8
+[0.5.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.6...v0.5.7
+[0.5.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.5...v0.5.6
+[0.5.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.4...v0.5.5
+[0.5.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.3...v0.5.4
+[0.5.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.2...v0.5.3
+[0.5.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.1...v0.5.2
+[0.5.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.0...v0.5.1
+[0.5.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.4.2...v0.5.0
+[0.4.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.4.1...v0.4.2
+[0.4.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.4.0...v0.4.1
+[0.4.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.9...v0.4.0
+[0.3.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.8...v0.3.9
+[0.3.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.7...v0.3.8
+[0.3.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.6...v0.3.7
+[0.3.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.5...v0.3.6
+[0.3.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.4...v0.3.5
+[0.3.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.3...v0.3.4
+[0.3.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.2...v0.3.3
+[0.3.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.1...v0.3.2
+[0.3.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.3.0...v0.3.1
+[0.3.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.9...v0.3.0
+[0.2.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.8...v0.2.9
+[0.2.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.7...v0.2.8
+[0.2.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.6...v0.2.7
+[0.2.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.5...v0.2.6
+[0.2.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.4...v0.2.5
+[0.2.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.3...v0.2.4
+[0.2.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.2...v0.2.3
+[0.2.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.1...v0.2.2
+[0.2.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.2.0...v0.2.1
+[0.2.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.9...v0.2.0
+[0.1.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.8...v0.1.9
+[0.1.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.7...v0.1.8
+[0.1.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.6...v0.1.7
+[0.1.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.5...v0.1.6
+[0.1.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.4...v0.1.5
+[0.1.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.3...v0.1.4
+[0.1.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.2...v0.1.3
+[0.1.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.1...v0.1.2
+[0.1.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.1.0...v0.1.1
 
-[0.1.0]: https://gitee.com/quant1x/base.git/releases/tag/v0.1.0
+[0.1.0]: https://gitee.com/quant1x/q1x-base.git/releases/tag/v0.1.0
