@@ -41,7 +41,7 @@ setuptools.setup(
     version=__app_version__,
     author=__app_author__,
     long_description=readme,
-    packages=setuptools.find_packages(include=["q1x","q1x.base.*"]),
+    packages=setuptools.find_packages(include=["q1x", "q1x.*"]),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
