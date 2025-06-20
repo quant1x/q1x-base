@@ -6,8 +6,8 @@ from functools import lru_cache
 
 import pandas as pd
 
-from base1x import exchange
-from base1x import base
+from q1x.base import exchange
+from q1x.base import base
 
 
 @lru_cache(maxsize=None)

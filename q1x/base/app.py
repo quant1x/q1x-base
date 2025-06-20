@@ -2,7 +2,7 @@
 import os.path
 import sys
 
-from base1x import file
+from q1x.base import file
 
 
 def application() -> tuple[str, str, str]:

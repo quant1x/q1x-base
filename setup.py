@@ -3,8 +3,8 @@
 """The setup script."""
 import setuptools
 
-from base1x import __author__
-from base1x.version import project_version
+from q1x.base import __author__
+from q1x.base.version import project_version
 
 try:
     from setuptools import find_packages, setup
@@ -37,11 +37,11 @@ setuptools.setup(
     name="quant1x-base",
     description="Quant1X量化系统python基础库",
     author_email="wangfengxy@sina.cn",
-    url="https://gitee.com/quant1x/base",
+    url="https://gitee.com/quant1x/q1x-base",
     version=__app_version__,
     author=__app_author__,
     long_description=readme,
-    packages=setuptools.find_packages(include=["base1x", "base1x.*"]),
+    packages=setuptools.find_packages(include=["q1x.*"]),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
