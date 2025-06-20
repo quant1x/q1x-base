@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-06-20
+### Changed
+- 调整顶层package
+
 ## [0.5.12] - 2025-06-20
 ### Changed
 - 调整顶层package
+- update changelog
 
 ## [0.5.11] - 2025-06-20
 ### Changed
@@ -260,7 +265,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.12...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.0...HEAD
+[0.6.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.12...v0.6.0
 [0.5.12]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.11...v0.5.12
 [0.5.11]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.10...v0.5.11
 [0.5.10]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.9...v0.5.10
