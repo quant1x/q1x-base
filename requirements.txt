@@ -9,7 +9,7 @@ icecream~=2.1.4
 # 3. configure
 PyYAML~=6.0.2
 # 4. num & dataframe
-numpy~=1.26.4
-pandas~=2.2.3
+numpy~=2.3.0
+pandas~=2.3.0
 # 5. git
 gitpython~=3.1.44
