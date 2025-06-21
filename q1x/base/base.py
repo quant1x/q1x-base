@@ -5,7 +5,6 @@ import yaml
 
 from q1x.base import file
 
-
 def get_quant1x_config_filename() -> str:
     """
     获取quant1x.yaml文件路径
@@ -25,33 +24,48 @@ def get_quant1x_config_filename() -> str:
 
 # 安全加载YAML配置
 def load_config(file_path: str) -> dict:
+    """安全加载YAML配置"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
-            return yaml.safe_load(f)
+            config = yaml.safe_load(f) or {}
+            return config
     except FileNotFoundError:
         raise ValueError(f"配置文件 {file_path} 不存在")
     except yaml.YAMLError as e:
         raise ValueError(f"YAML格式错误: {str(e)}")
+    except Exception as e:
+        raise ValueError(f"加载配置失败: {str(e)}")
 
+class Quant1XConfig:
+    _instance = None
 
-# 获取用户目录, GOX_HOME环境变量优先宿主目录
-quant1x_home = file.homedir()
-# 获取配置文件路径
-config_filename = get_quant1x_config_filename()
-# 加载配置文件
-config = load_config(config_filename)
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialize()
+        return cls._instance
 
-# quant1x在宿主目录的路径
-quant1x_main_path = os.path.expanduser('~')
-if quant1x_main_path == quant1x_home:
-    quant1x_main_path = os.path.join(quant1x_main_path, '.quant1x')
-# 元数据路径
-quant1x_data_meta = os.path.join(quant1x_main_path, 'meta')
-# 读取basedir配置
-basedir = config['basedir'].strip()
-# 如果basedir配置无效, 则默认使用{$quant1x_home}/data
-if len(basedir) == 0:
-    basedir = os.path.join(quant1x_home, 'data')
+    def _initialize(self):
+        """初始化配置"""
+        self.__home_path = file.homedir()
+        self.__config_filename = get_quant1x_config_filename()
+        self.__config = load_config(self.__config_filename)
 
-# 日线数据路径
-quant1x_data_day = os.path.join(basedir, 'day')
+        # 初始化路径
+        self.__default_main_path = os.path.join(self.__home_path, '.quant1x')
+
+        self.meta_path = os.path.join(self.__default_main_path, 'meta')
+        """str: 元数据路径"""
+
+        self.data_path = self.__config.get('basedir', '').strip()
+        """str: 数据目录 """
+
+        if not self.data_path:
+            self.data_path = os.path.join(self.__default_main_path, 'data')
+
+        # 数据路径
+        self.kline_path = os.path.join(self.data_path, 'day')
+        """str: K线路径 """
+
+# 创建配置单例
+config = Quant1XConfig()

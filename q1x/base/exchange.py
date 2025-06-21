@@ -190,7 +190,7 @@ def __calendar() -> pandas.Series:
     """
     交易日历
     """
-    fn = os.path.join(base.quant1x_data_meta, "calendar")
+    fn = os.path.join(base.config.meta_path, "calendar")
     df = pandas.read_csv(fn)
     return df['date']
 

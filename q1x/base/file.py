@@ -2,6 +2,14 @@
 import os
 
 
+def env(key: str) -> str:
+    """
+    获取环境变量
+    """
+    value = os.getenv(key, '')
+    return value.strip()
+
+
 def mkdirs(path: str):
     """
     创建目录
@@ -27,14 +35,12 @@ def touch(filename: str):
 def homedir() -> str:
     """
     获取宿主目录
-    首先会获取环境变量GOX_HOME, 如果不存在则用~
+    首先会依次获取环境变量QUANT1X_HOME, GOX_HOME, 如果不存在则用~
     :return:
     """
-    gox_home = os.getenv("GOX_HOME", '')
-    gox_home = gox_home.strip()
-    if len(gox_home) == 0:
+    user_home = env('QUANT1X_HOME')
+    if len(user_home) == 0:
+        user_home = env("GOX_HOME")
+    if len(user_home) == 0:
         user_home = os.path.expanduser('~')
-    else:
-        user_home = gox_home
     return user_home
-

@@ -15,7 +15,7 @@ def securities() -> pd.DataFrame:
     """
     证券列表
     """
-    full_path = os.path.join(base.quant1x_data_meta, 'securities.csv')
+    full_path = os.path.join(base.config.meta_path, 'securities.csv')
     if not os.path.isfile(full_path):
         return pd.DataFrame()
     df = pd.read_csv(full_path)
@@ -30,7 +30,7 @@ def block_list():
     板块列表
     """
     df = securities()
-    return df[df['code'].astype(str).str.startswith('sh880', 'sh881')]
+    return df[df['code'].astype(str).str.startswith(('sh880', 'sh881'))]
 
 
 def stock_name(code: str) -> str:
@@ -47,7 +47,7 @@ def klines(code: str) -> pd.DataFrame | None:
     """
     corrected_symbol = exchange.correct_security_code(code)
     suffix_length = 3  # 修正拼写并明确表示后缀长度
-    symbol_directory = os.path.join(base.quant1x_data_day, corrected_symbol[:-suffix_length])  # 更清晰表达目录用途
+    symbol_directory = os.path.join(base.config.kline_path, corrected_symbol[:-suffix_length])  # 更清晰表达目录用途
     file_extension = '.csv'
     filename = f"{corrected_symbol}{file_extension}"  # 使用f-string格式化
     full_path = os.path.join(symbol_directory, filename)
@@ -66,7 +66,7 @@ def sector_filename(date: str = '') -> str:
     cache_date = date.strip()
     if len(cache_date) == 0:
         cache_date = exchange.last_trade_date()
-    filename = os.path.join(base.quant1x_data_meta, f'{name}.{cache_date}')
+    filename = os.path.join(base.config.meta_path, f'{name}.{cache_date}')
     return filename
 
 
@@ -104,8 +104,8 @@ def get_sector_constituents(code: str) -> list[str]:
 
 if __name__ == '__main__':
     print(base.get_quant1x_config_filename())
-    print('basedir', base.basedir)
-    print('quant1x_data_day', base.quant1x_data_day)
+    print('data_path', base.config.data_path)
+    print('kline_path', base.config.kline_path)
     code = '600600'
     df = klines(code)
     print(df)
