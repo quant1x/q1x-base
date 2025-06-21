@@ -5,9 +5,11 @@ import os
 from functools import lru_cache
 
 import pandas as pd
+from dateutil import parser
+from pandas import DataFrame
 
-from q1x.base import exchange
 from q1x.base import base
+from q1x.base import exchange
 
 
 @lru_cache(maxsize=None)
@@ -102,6 +104,31 @@ def get_sector_constituents(code: str) -> list[str]:
     return list
 
 
+def date_format(date: str, layout:str='%Y-%m-%d') -> str:
+    dt = parser.parse(date)  # 自动识别各种常见日期格式
+    return dt.strftime(layout)
+
+
+@lru_cache(maxsize=None)
+def get_tick_data(code: str, date: str) -> DataFrame | None:
+    """获取分时"""
+    code = code.strip()
+    corrected_symbol = exchange.correct_security_code(code)
+    file_extension = '.csv'
+    filename = f"{corrected_symbol}{file_extension}"  # 使用f-string格式化
+    cache_date = date.strip()
+    if len(cache_date) == 0:
+        cache_date = exchange.last_trade_date()
+    # 获取年份
+    cache_date = date_format(cache_date, layout='%Y%m%d')
+    year = cache_date[:4]
+    base_path = os.path.join(base.config.data_path, 'minutes')
+    full_path = os.path.join(base_path, year, cache_date, filename)
+
+    if os.path.isfile(full_path):
+        return pd.read_csv(full_path)
+    return None
+
 if __name__ == '__main__':
     print(base.get_quant1x_config_filename())
     print('data_path', base.config.data_path)
@@ -126,3 +153,6 @@ if __name__ == '__main__':
     l1 = get_sector_constituents('880675')
     print(l1)
     print(type(l1))
+
+    df2 = get_tick_data(code, date='2025-06-20')
+    print(df2)
