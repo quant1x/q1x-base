@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.3] - 2025-06-22
+### Changed
+- 新增因子自动挖掘demo工程
+
 ## [0.6.2] - 2025-06-21
 ### Changed
 - 新增分时数据接口
+- update changelog
 
 ## [0.6.1] - 2025-06-21
 ### Changed
@@ -277,7 +282,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.2...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.3...HEAD
+[0.6.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.2...v0.6.3
 [0.6.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.1...v0.6.2
 [0.6.1]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.0...v0.6.1
 [0.6.0]: https://gitee.com/quant1x/q1x-base.git/compare/v0.5.12...v0.6.0
