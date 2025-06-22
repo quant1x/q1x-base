@@ -129,6 +129,26 @@ def get_tick_data(code: str, date: str) -> DataFrame | None:
         return pd.read_csv(full_path)
     return None
 
+@lru_cache(maxsize=None)
+def get_tick_transation(code: str, date: str) -> DataFrame | None:
+    """获取分时"""
+    code = code.strip()
+    corrected_symbol = exchange.correct_security_code(code)
+    file_extension = '.csv'
+    filename = f"{corrected_symbol}{file_extension}"  # 使用f-string格式化
+    cache_date = date.strip()
+    if len(cache_date) == 0:
+        cache_date = exchange.last_trade_date()
+    # 获取年份
+    cache_date = date_format(cache_date, layout='%Y%m%d')
+    year = cache_date[:4]
+    base_path = os.path.join(base.config.data_path, 'trans')
+    full_path = os.path.join(base_path, year, cache_date, filename)
+
+    if os.path.isfile(full_path):
+        return pd.read_csv(full_path)
+    return None
+
 if __name__ == '__main__':
     print(base.get_quant1x_config_filename())
     print('data_path', base.config.data_path)
@@ -156,3 +176,5 @@ if __name__ == '__main__':
 
     df2 = get_tick_data(code, date='2025-06-20')
     print(df2)
+    df3 = get_tick_transation(code, date='2025-06-20')
+    print(df3)
