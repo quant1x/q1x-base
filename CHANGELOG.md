@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.5] - 2025-07-21
+### Changed
+- 删除废弃的代码
+- 删除废弃的代码
+
 ## [0.6.4] - 2025-06-22
 ### Changed
 - 新增获取分笔成交记录
+- update changelog
 
 ## [0.6.3] - 2025-06-22
 ### Changed
@@ -287,7 +293,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.4...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.5...HEAD
+[0.6.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.4...v0.6.5
 [0.6.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.3...v0.6.4
 [0.6.3]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.2...v0.6.3
 [0.6.2]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.1...v0.6.2
