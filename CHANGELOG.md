@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.7] - 2025-07-29
+### Changed
+- 新增核心功能包, 增加波浪检测工具
+- 新增MA移动平均线, window_shift>0均线做shift操作, 且数据集合长度大于0小于滑动窗口N也做算数平均
+
 ## [0.6.6] - 2025-07-29
 ### Changed
 - 新增转换K线周期功能, 支持周线、月线、季线和年线
+- update changelog
 
 ## [0.6.5] - 2025-07-21
 ### Changed
@@ -298,7 +304,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.7...HEAD
+[0.6.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.6...v0.6.7
 [0.6.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.5...v0.6.6
 [0.6.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.4...v0.6.5
 [0.6.4]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.3...v0.6.4
