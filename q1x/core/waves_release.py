@@ -3,12 +3,11 @@
 """
 @Project : q1x-base
 @Package : core
-@File    : waves_klines.py
+@File    : waves_release.py
 @Author  : wangfeng
-@Date    : 2025/7/29 14:09
-@Desc    : 波浪检测 - k线测试
+@Date    : 2025/7/30 11:05
+@Desc    : 波浪+多空力量
 """
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -78,7 +77,7 @@ def calculate_t_values_with_positions(klines, peaks, valleys):
     return t_indices, t_values, pairs
 
 
-def find_closest_price_index(klines, start_idx, target_price):
+def find_closest_price_index_v1(klines, start_idx, target_price):
     """
     在指定起始位置之后找到最接近目标价格的位置
 
@@ -105,6 +104,25 @@ def find_closest_price_index(klines, start_idx, target_price):
 
     return closest_idx if closest_idx != start_idx else start_idx + 5  # 默认向前5个位置
 
+def find_closest_price_index(klines, start_idx, target_price):
+    """
+    在指定起始位置之后，找到第一个最低价（low）低于或等于目标价格的K线索引。
+
+    Parameters:
+    klines: K线数据
+    start_idx: 起始索引（搜索从此处之后开始）
+    target_price: 目标价格
+
+    Returns:
+    idx: 找到的第一个符合条件的K线索引，如果未找到则返回默认值。
+    """
+    # 在起始索引之后的所有数据中寻找
+    for i in range(start_idx + 1, len(klines)):
+        if klines['low'].iloc[i] <= target_price:
+            return i  # 找到第一个符合条件的，立即返回
+
+    # 如果循环结束都没找到，则返回一个默认值（例如起始索引+5）
+    return start_idx + 5
 
 # 简化版本（推荐使用）
 def get_peak_valley_pairs_with_t(klines, peaks, valleys):
@@ -153,11 +171,12 @@ def get_peak_valley_pairs_with_t(klines, peaks, valleys):
 VOLUME_SPIKE_THRESHOLD = 0.005
 WINDOW = 13
 MA_PERIODS = [5, 10, 20]
-target_period = 'w'  # 年线
+target_period = 'd'  # 年线
 period_name = cache.get_period_name(target_period)
 target_tail = 89  # 尾部多少条数据
+SHOW_SHADOW = False
 
-code = 'sz000158'
+code = 'sz002956'
 name = cache.stock_name(code)
 print(f'{name}({code})')
 
@@ -290,15 +309,16 @@ peaks, valleys = waves.detect_peaks_and_valleys(klines['high'].values, klines['l
 for p in peaks:
     print(klines.iloc[p]['high'])
 t_indices, t_values, pairs = calculate_t_values_with_positions(klines, peaks, valleys)
-# ====== 绘图 ======
-fig, (ax_kline, ax_vol) = plt.subplots(2, 1, figsize=(16, 9),
-                                       gridspec_kw={'height_ratios': [3, 1]},
-                                       sharex=True)
-# ====== 修改2：缩小K线和成交量柱宽度 ======
-candle_width = 0.6  # 原0.8改为0.6 ← 这里改
-vol_width = candle_width * 1  # 保持比例
 
-# 1. 绘制K线
+# ====== 绘图（三子图：K线 + 成交量 + 多空力量）======
+fig, (ax_kline, ax_vol, ax_power) = plt.subplots(3, 1, figsize=(16, 9),
+                                                 gridspec_kw={'height_ratios': [3, 1, 1], 'hspace': 0.1},
+                                                 sharex=True)
+
+# ====== 1. 绘制K线 ======
+candle_width = 0.6
+ma_colors = ['gold', 'deepskyblue', 'darkviolet']
+
 for idx, row in klines.iterrows():
     color = 'red' if row['close'] >= row['open'] else 'green'
     ax_kline.plot([row['x_pos'], row['x_pos']],
@@ -310,151 +330,58 @@ for idx, row in klines.iterrows():
                  width=candle_width, color=color,
                  edgecolor=color)
 
-# 2. 绘制均线
-ma_colors = ['gold', 'deepskyblue', 'darkviolet']
+# 绘制均线
 for period, color in zip(MA_PERIODS, ma_colors):
     ax_kline.plot(klines['x_pos'], klines[f'ma{period}'],
                   color=color, lw=1.5, label=f'{period}{period_name}均线')
 
-ax_kline.grid(True, which='major', linestyle='--', linewidth=0.5, alpha=0.5)
-ax_vol.grid(True, which='major', linestyle='--', linewidth=0.5, alpha=0.5)
-
-annotate_font_size = 9
-# # 3. 标注堆量区间最高价
-# for idx, row in klines[klines['spike_high'].notna()].iterrows():
-#     price_text = f"B: {row['spike_high']:.2f}"  # 格式化价格为两位小数
-#     ax_kline.annotate(price_text,
-#                       xy=(row['x_pos'], row['spike_high']),
-#                       xytext=(0, 10),
-#                       textcoords='offset points',
-#                       ha='center',
-#                       va='bottom',
-#                       color='red',
-#                       fontsize=annotate_font_size,
-#                       fontweight='bold',
-#                       bbox=dict(boxstyle='round,pad=0.3',
-#                                 fc='white',
-#                                 ec='blue',
-#                                 lw=1,
-#                                 alpha=0.8))
-#
-# # 4. 标注相邻区间最低价（A点）（新增部分）
-# for idx, row in klines[klines['spike_low'].notna()].iterrows():
-#     price_text = f"A: {row['spike_low']:.2f}"
-#     ax_kline.annotate(price_text,
-#                       xy=(row['x_pos'], row['spike_low']),
-#                       xytext=(0, -15),  # 向下偏移
-#                       textcoords='offset points',
-#                       ha='center',
-#                       va='top',
-#                       color='darkgreen',
-#                       fontsize=annotate_font_size,
-#                       fontweight='bold',
-#                       bbox=dict(boxstyle='round,pad=0.3',
-#                                 fc='white',
-#                                 ec='darkgreen',
-#                                 lw=1,
-#                                 alpha=0.8))
-#
-# # 2. 绘制C点标记（新增）
-# for idx, row in klines[klines['c_point'].notna()].iterrows():
-#     # 标记点
-#     ax_kline.scatter(row['x_pos'], row['c_point'],
-#                      color='darkorange', s=100, zorder=5,
-#                      edgecolors='white', linewidths=1)
-#
-#     # 标记文本
-#     ax_kline.annotate(f'C: {row["c_point"]:.2f}',
-#                       xy=(row['x_pos'], row['c_point']),
-#                       xytext=(0, -25),
-#                       textcoords='offset points',
-#                       ha='center',
-#                       va='top',
-#                       color='darkorange',
-#                       fontsize=annotate_font_size,
-#                       fontweight='bold',
-#                       bbox=dict(boxstyle='round,pad=0.3',
-#                                 fc='white',
-#                                 ec='darkorange',
-#                                 lw=1,
-#                                 alpha=0.8))
-#
-#     # 参考线
-#     ax_kline.axhline(row['c_point'],
-#                      color='darkorange',
-#                      linestyle=':',
-#                      alpha=0.3,
-#                      lw=1)
-
+# ====== 2. 标注波峰(P)、波谷(V)、C点(T)等 ======
 # 标注波峰(P)
 for i, p in enumerate(peaks):
-    if p < len(klines):  # 防止索引越界
+    if p < len(klines):
         ax_kline.scatter(p, klines['high'].iloc[p],
-                         color='red', marker='^', s=100, zorder=5,
-                         label='Peak' if p == peaks[0] else "")
+                         color='red', marker='^', s=100, zorder=5)
         ax_kline.text(p, klines['high'].iloc[p], f'P{i + 1}: {klines["high"].iloc[p]:.2f}',
-                      ha='center', va='bottom', color='red')
+                      ha='center', va='bottom', color='red', fontsize=8)
 
 # 标注波谷(V)
 for i, v in enumerate(valleys):
-    print('valleys:', v)
-    if v < len(klines):  # 防止索引越界
+    if v < len(klines):
         ax_kline.scatter(v, klines['low'].iloc[v],
-                         color='blue', marker='v', s=100, zorder=5,
-                         label='Valley' if v == valleys[0] else "")
+                         color='blue', marker='v', s=100, zorder=5)
         ax_kline.text(v, klines['low'].iloc[v], f'V{i + 1}: {klines["low"].iloc[v]:.2f}',
-                      ha='center', va='top', color='blue')
+                      ha='center', va='top', color='blue', fontsize=8)
 
-# 标注T点
+# 标注T点（即C点）
 if t_indices and t_values:
     t_x = [i for i in t_indices if i < len(klines)]
-    t_y = []
-    for i in t_x:
-        # 找到最接近T值的实际价格点
-        if i < len(klines):
-            # 在该位置的所有价格中找最接近T值的
-            prices = [klines['high'].iloc[i], klines['low'].iloc[i], klines['close'].iloc[i]]
-            closest_price = min(prices, key=lambda x: abs(x - t_values[t_x.index(i)]))
-            t_y.append(closest_price)
-        else:
-            t_y.append(t_values[t_x.index(i)])
-
-    ax_kline.scatter(t_x, t_y, color='red', s=120, marker='+', label='C点', zorder=5)
-
-    # 为T点添加标签
+    t_y = [klines['low'].iloc[i] for i in t_x]  # 用low近似
+    ax_kline.scatter(t_x, t_y, color='darkorange', s=120, marker='+', zorder=5, linewidths=2)
     for i, (x, y, t_val) in enumerate(zip(t_x, t_y, t_values[:len(t_x)])):
         ax_kline.annotate(f'C{i + 1}: {t_val:.2f}',
                           (x, y),
                           xytext=(5, 10),
                           textcoords='offset points',
                           fontsize=8,
-                          bbox=dict(boxstyle='round,pad=0.3', facecolor='yellow', alpha=0.7))
-    # 在波峰和T点之间连线
-    for pair, t_idx, t_val in zip(pairs, t_indices, t_values):
-        peak_idx = pair['peak_idx']
-        if peak_idx < len(klines) and t_idx < len(klines):
-            peak_price = klines['high'].iloc[peak_idx]
+                          bbox=dict(boxstyle='round,pad=0.3', facecolor='orange', alpha=0.7))
 
-            # 找到T点的实际坐标
-            prices = [klines['high'].iloc[t_idx], klines['low'].iloc[t_idx], klines['close'].iloc[t_idx]]
-            closest_price = min(prices, key=lambda x: abs(x - t_val))
-
-            # 绘制连线
-            ax_kline.plot([peak_idx, t_idx], [peak_price, closest_price],
-                          'green', linestyle='--', alpha=0.7, linewidth=1.5,
-                          label='B->C' if pair == pairs[0] else "")
-
-# 添加配对连线（可选）
+# 连接波谷->波峰->T点
 for pair in pairs:
     valley_idx = pair['valley_idx']
     peak_idx = pair['peak_idx']
     if valley_idx < len(klines) and peak_idx < len(klines):
-        valley_price = klines['low'].iloc[valley_idx]
-        peak_price = klines['high'].iloc[peak_idx]
-        ax_kline.plot([valley_idx, peak_idx], [valley_price, peak_price],
-                      'red', linestyle='--', alpha=0.7, linewidth=1.5, label='A->B' if pair == pairs[0] else "")
+        ax_kline.plot([valley_idx, peak_idx],
+                      [klines['low'].iloc[valley_idx], klines['high'].iloc[peak_idx]],
+                      'red', linestyle='--', alpha=0.7, linewidth=1.5)
+        t_idx = pair['t_actual_idx']
+        if t_idx < len(klines):
+            t_price = klines['low'].iloc[t_idx]
+            ax_kline.plot([peak_idx, t_idx],
+                          [klines['high'].iloc[peak_idx], t_price],
+                          'green', linestyle='--', alpha=0.7, linewidth=1.5)
 
-# 4. 绘制成交量
+# ====== 3. 绘制成交量 ======
+vol_width = candle_width * 1
 for idx, row in klines.iterrows():
     ax_vol.bar(row['x_pos'], row['volume'],
                width=vol_width, alpha=0.6,
@@ -463,11 +390,93 @@ for idx, row in klines.iterrows():
         ax_vol.plot(row['x_pos'], row['volume'] * 1.02,
                     '^', color='darkred', markersize=6, alpha=0.8)
 
-# 5. 绘制量能指标
 ax_vol.plot(klines['x_pos'], klines['hist_ma'],
             'orange', lw=1.5, label=f'{WINDOW}{period_name}量均线')
 ax_vol.plot(klines['x_pos'], klines['locked_threshold'],
             '--', color='purple', lw=1, alpha=0.5, label='锁定阈值')
+
+# ====== 4. 新增：多空力量分析图 ======
+# ====== 统一计算技术指标 ======
+klines['Body'] = abs(klines['close'] - klines['open'])
+klines['UpperShadow'] = klines['high'] - np.maximum(klines['open'], klines['close'])
+klines['LowerShadow'] = np.minimum(klines['open'], klines['close']) - klines['low']
+klines['BuyPower'] = klines['close'] - klines['low']
+klines['SellPower'] = klines['high'] - klines['close']
+klines['PowerDiff'] = klines['BuyPower'] - klines['SellPower']
+
+# ATR 和 DynamicThreshold
+atr_window = 14
+tr0 = klines['high'] - klines['low']
+tr1 = (klines['high'] - klines['close'].shift(1)).abs()
+tr2 = (klines['low'] - klines['close'].shift(1)).abs()
+klines['TR'] = pd.concat([tr0, tr1, tr2], axis=1).max(axis=1)
+klines['ATR'] = klines['TR'].ewm(alpha=1/atr_window, adjust=False).mean()
+klines['DynamicThreshold'] = klines['ATR'] * 0.3
+
+# 4.3 绘制
+ax_power.bar(klines['x_pos'] - 0.2, klines['UpperShadow'], width=0.4, color='orange', label='上影线', alpha=0.7)
+ax_power.bar(klines['x_pos'] + 0.2, -klines['LowerShadow'], width=0.4, color='cyan', label='下影线', alpha=0.7)
+ax_power.bar(klines['x_pos'], klines['PowerDiff'], width=0.6, color=np.where(klines['PowerDiff'] > 0, 'red', 'green'), alpha=0.5, label='力量差')
+ax_power.plot(klines['x_pos'], klines['DynamicThreshold'], color='purple', linestyle='-', linewidth=1.5, label='动态阈值')
+ax_power.plot(klines['x_pos'], -klines['DynamicThreshold'], color='purple', linestyle='-', linewidth=1.5)
+ax_power.axhline(0, color='gray', linestyle='--', linewidth=0.8)
+ax_power.set_ylabel('多空力量')
+ax_power.legend(loc='upper right', fontsize=9)
+ax_power.grid(True, alpha=0.3)
+
+# ====== 新增：长影线预警（避免与P/V三角重合）======
+if SHOW_SHADOW:
+    # # ====== 调试：打印影线与实体的比值 ======
+    # print("\n影线/实体比值（最后10根K线）：")
+    # debug_df = klines[['date', 'Body', 'UpperShadow', 'LowerShadow']].copy()
+    # debug_df['U/B'] = debug_df['UpperShadow'] / (debug_df['Body'] + 1e-8)  # 防止除零
+    # debug_df['L/B'] = debug_df['LowerShadow'] / (debug_df['Body'] + 1e-8)
+    #print(debug_df.tail(10))
+    # 2. 定义“中等K线”阈值（基于价格百分比）
+    price_level = klines['close'].median()  # 用中位数作为参考价格
+    min_body_pct = 0.005  # 最小体幅：0.5%
+    max_body_pct = 0.03   # 最大体幅：3.0%
+    min_body_threshold = price_level * min_body_pct
+    max_body_threshold = price_level * max_body_pct
+
+    # 3. 筛选中等K线
+    klines['is_medium_candle'] = (klines['Body'] >= min_body_threshold) & (klines['Body'] <= max_body_threshold)
+    SHADOW_ALERT_RATIO = 1
+    # 4. 上影线预警：长上影 + 中等实体
+    upper_alert = klines[
+        (klines['UpperShadow'] >= SHADOW_ALERT_RATIO * klines['Body']) &
+        (klines['is_medium_candle'])
+        ]
+
+    # 5. 下影线预警：长下影 + 中等实体
+    lower_alert = klines[
+        (klines['LowerShadow'] >= SHADOW_ALERT_RATIO * klines['Body']) &
+        (klines['is_medium_candle'])
+        ]
+
+    # 绘制上影线预警（> 黄色）
+    for idx in upper_alert.index:
+        row = klines.loc[idx]  # 使用 loc 获取整行
+        high_price = row['high']
+        offset_high = high_price * 1.01
+        x_pos = row['x_pos']  # 使用 x_pos 作为x坐标
+        ax_kline.scatter(x_pos, offset_high,
+                         color='yellow', marker='>', s=120, zorder=6,
+                         edgecolors='green', linewidth=1)
+        ax_kline.text(x_pos, offset_high * 1.005, 'S',
+                      ha='center', va='bottom', color='green', fontsize=10, fontweight='bold')
+
+    # 绘制下影线预警（< 洋红）
+    for idx in lower_alert.index:
+        row = klines.loc[idx]
+        low_price = row['low']
+        offset_low = low_price * 0.99
+        x_pos = row['x_pos']
+        ax_kline.scatter(x_pos, offset_low,
+                         color='magenta', marker='<', s=120, zorder=6,
+                         edgecolors='red', linewidth=1)
+        ax_kline.text(x_pos, offset_low * 0.995, 'B',
+                      ha='center', va='top', color='red', fontsize=10, fontweight='bold')
 
 # ====== 坐标轴范围控制 ======
 ax_kline.set_xlim(-0.5, len(klines) - 0.5)
@@ -476,18 +485,31 @@ ax_kline.set_ylim(
     klines[['high', 'ma5', 'ma10', 'ma20']].max().max() * 1.005
 )
 ax_vol.set_ylim(0, klines['volume'].max() * 1.2)
+ax_power.set_ylim(-klines['UpperShadow'].max() * 1.3, klines['UpperShadow'].max() * 1.3)  # 力量图y轴
 
-# 设置X轴刻度（确保显示所有日期）
-ax_vol.set_xticks(klines['x_pos'])  # 所有位置都设刻度
-ax_vol.set_xticklabels(klines['date'].dt.strftime('%Y-%m-%d'))  # 所有日期转文本
+# ====== ✅ 正确设置x轴标签：只在最下面的子图显示 ======
+ax_kline.set_xlim(-0.5, len(klines) - 0.5)
+ax_kline.set_ylim(
+    klines[['low', 'ma5', 'ma10', 'ma20']].min().min() * 0.995,
+    klines[['high', 'ma5', 'ma10', 'ma20']].max().max() * 1.005
+)
+ax_vol.set_ylim(0, klines['volume'].max() * 1.2)
 
-plt.setp(ax_vol.get_xticklabels(), rotation=45, ha='right')
+# ❌ 关闭上面的标签显示
+ax_kline.set_xticklabels([])
+
+# 如果有力量图 ax_power，则重复上述逻辑
+if 'ax_power' in locals():
+    ax_power.set_xticks(klines['x_pos'])
+    ax_power.set_xticklabels(klines['date'].dt.strftime('%Y-%m-%d'), rotation=45, ha='right')
+    ax_power.grid(True, alpha=0.3)
 
 # ====== 图例与标题 ======
 ax_kline.legend(loc='upper left')
 ax_vol.legend(loc='upper left')
-ax_kline.set_title(f'{name}({code}) CT模型+堆量{period_name}线', pad=20, fontsize=14)
+ax_kline.set_title(f'{name}({code}) CT模型+堆量{period_name}线 + 买卖力量分析', pad=20, fontsize=14)
 ax_vol.set_ylabel('成交量(手)')
+ax_power.set_ylabel('力量分析')
 
-plt.subplots_adjust(left=0.1, right=0.85, hspace=0.1)
+plt.subplots_adjust(left=0.1, right=0.85, hspace=0.1, bottom=0.15)  # 增加底部空间以容纳日期
 plt.show()
