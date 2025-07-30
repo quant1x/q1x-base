@@ -293,7 +293,7 @@ if __name__ == "__main__":
         print(f"  段{i + 1:2d}: {start:2d} → {end:2d} (L{level}, {direction})")
 
     # 绘图
-    plot_wave_structure(test_high, waves, peaks=peaks, valleys=valleys)
+    plot_wave_structure('多级波段', test_high, waves, peaks=peaks, valleys=valleys)
 
     # 示例2：你的原始测试数据
     print("\n" + "=" * 60)
