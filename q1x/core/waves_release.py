@@ -93,7 +93,7 @@ def find_closest_price_index_v1(klines, start_idx, target_price):
     closest_idx = start_idx
 
     # 在波峰之后的数据中寻找
-    for i in range(start_idx + 1, min(start_idx + 50, len(klines))):  # 限制搜索范围
+    for i in range(start_idx + 1, len(klines)):  # 限制搜索范围
         # 可以检查high, low, close等价格
         prices = [klines['high'].iloc[i], klines['low'].iloc[i], klines['close'].iloc[i]]
         for price in prices:
@@ -122,7 +122,7 @@ def find_closest_price_index(klines, start_idx, target_price):
             return i  # 找到第一个符合条件的，立即返回
 
     # 如果循环结束都没找到，则返回一个默认值（例如起始索引+5）
-    return start_idx + 5
+    return find_closest_price_index_v1(klines, start_idx, target_price)
 
 # 简化版本（推荐使用）
 def get_peak_valley_pairs_with_t(klines, peaks, valleys):
@@ -171,12 +171,12 @@ def get_peak_valley_pairs_with_t(klines, peaks, valleys):
 VOLUME_SPIKE_THRESHOLD = 0.005
 WINDOW = 13
 MA_PERIODS = [5, 10, 20]
-target_period = 'd'  # 年线
+target_period = 'w'  # 年线
 period_name = cache.get_period_name(target_period)
-target_tail = 89  # 尾部多少条数据
+target_tail = 100  # 尾部多少条数据
 SHOW_SHADOW = False
 
-code = 'sz002956'
+code = 'sz000158'
 name = cache.stock_name(code)
 print(f'{name}({code})')
 
@@ -507,6 +507,7 @@ if 'ax_power' in locals():
 # ====== 图例与标题 ======
 ax_kline.legend(loc='upper left')
 ax_vol.legend(loc='upper left')
+ax_power.legend(loc='upper left')
 ax_kline.set_title(f'{name}({code}) CT模型+堆量{period_name}线 + 买卖力量分析', pad=20, fontsize=14)
 ax_vol.set_ylabel('成交量(手)')
 ax_power.set_ylabel('力量分析')
