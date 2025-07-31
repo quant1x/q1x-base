@@ -10,6 +10,9 @@
 """
 
 
+import numpy as np
+import pandas as pd
+
 def hidden_spread(mid_price, bid, ask):
     """
     隐形价差(率)
@@ -24,3 +27,17 @@ def hidden_spread(mid_price, bid, ask):
         隐形价差=(ask-bid) / mid_price
     """
     return (ask - bid) / mid_price
+
+
+def volatility(price_series, window=30):
+    """
+    移动平均波动率
+    Args:
+        price_series: 价格序列
+        window: 滑动窗口, 默认30
+
+    Returns:
+
+    """
+    returns = np.log(price_series / price_series.shift(1)).dropna()
+    return returns.rolling(window).std() * np.sqrt(252)
