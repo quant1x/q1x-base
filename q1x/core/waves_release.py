@@ -6,7 +6,7 @@
 @File    : waves_release.py
 @Author  : wangfeng
 @Date    : 2025/7/30 11:05
-@Desc    : 波浪+多空力量
+@Desc    : 波浪+多空力度
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -171,19 +171,19 @@ def get_peak_valley_pairs_with_t(klines, peaks, valleys):
 VOLUME_SPIKE_THRESHOLD = 0.005
 WINDOW = 13
 MA_PERIODS = [5, 10, 20]
-target_period = 'w'  # 年线
+target_period = 'd'  # 周期
 period_name = cache.get_period_name(target_period)
-target_tail = 100  # 尾部多少条数据
+target_tail = 89  # 尾部多少条数据
 SHOW_SHADOW = False
 
-code = 'sz000158'
+code = 'sh000001'
 name = cache.stock_name(code)
 print(f'{name}({code})')
 
 # 数据加载
 klines = cache.klines(code)
 klines = cache.convert_klines_trading(klines, period=target_period)
-if len(klines) >= target_tail:
+if target_tail>0 and len(klines) >= target_tail:
     klines = klines.tail(target_tail)
 klines['date'] = pd.to_datetime(klines['date'])
 klines['x_pos'] = np.arange(len(klines))
@@ -310,7 +310,7 @@ for p in peaks:
     print(klines.iloc[p]['high'])
 t_indices, t_values, pairs = calculate_t_values_with_positions(klines, peaks, valleys)
 
-# ====== 绘图（三子图：K线 + 成交量 + 多空力量）======
+# ====== 绘图（三子图：K线 + 成交量 + 多空力度）======
 fig, (ax_kline, ax_vol, ax_power) = plt.subplots(3, 1, figsize=(16, 9),
                                                  gridspec_kw={'height_ratios': [3, 1, 1], 'hspace': 0.1},
                                                  sharex=True)
@@ -380,6 +380,140 @@ for pair in pairs:
                           [klines['high'].iloc[peak_idx], t_price],
                           'green', linestyle='--', alpha=0.7, linewidth=1.5)
 
+# ====== 新增：判断高点和低点连线是否存在未来交叉，并绘制延长线 ======
+def line_intersection(p1, p2, p3, p4):
+    """
+    计算两条直线 (p1,p2) 和 (p3,p4) 的交点。
+    p = (x, y)
+    返回交点 (x, y) 或 None（无交点或平行）。
+    """
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+    x4, y4 = p4
+
+    denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+    if abs(denom) < 1e-10:
+        return None
+
+    ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom
+    if ua >= 0:
+        x = x1 + ua * (x2 - x1)
+        y = y1 + ua * (y2 - y1)
+        return (x, y)
+    return None
+
+# 获取最近的两个高点和低点
+last_index = len(klines) - 1  # 最后一根K线的索引
+
+# 过滤掉在最后一根K线上的波峰和波谷
+filtered_peaks = [p for p in peaks if p != last_index]
+filtered_valleys = [v for v in valleys if v != last_index]
+
+print(f"原始波峰: {sorted(peaks)}, 过滤后: {sorted(filtered_peaks)}")
+print(f"原始波谷: {sorted(valleys)}, 过滤后: {sorted(filtered_valleys)}")
+
+# 检查过滤后是否至少有两个波峰和两个波谷
+if len(filtered_peaks) >= 2 and len(filtered_valleys) >= 2:
+    # 取最近的两个高点
+    recent_peaks = sorted(filtered_peaks)[-2:]
+    p1_idx, p2_idx = recent_peaks[0], recent_peaks[1]
+    p1 = (klines['x_pos'].iloc[p1_idx], klines['high'].iloc[p1_idx])
+    p2 = (klines['x_pos'].iloc[p2_idx], klines['high'].iloc[p2_idx])
+
+    # 计算高点趋势延长线的斜率和截距
+    slope_high = (p2[1] - p1[1]) / (p2[0] - p1[0]) if (p2[0] - p1[0]) != 0 else 0
+    high_line_x = [p1[0], klines['x_pos'].iloc[-1]]  # 延伸到最后一根K线
+    high_line_y = [p1[1], p2[1] + slope_high * (klines['x_pos'].iloc[-1] - p2[0])]
+
+    # 绘制高点趋势延长线
+    ax_kline.plot(high_line_x, high_line_y, color='purple', linestyle='-', linewidth=2.5, alpha=0.9, label='高点趋势延长线')
+
+    # 取最近的两个低点
+    recent_valleys = sorted(filtered_valleys)[-2:]
+    v1_idx, v2_idx = recent_valleys[0], recent_valleys[1]
+    v1 = (klines['x_pos'].iloc[v1_idx], klines['low'].iloc[v1_idx])
+    v2 = (klines['x_pos'].iloc[v2_idx], klines['low'].iloc[v2_idx])
+
+    # 计算低点趋势延长线的斜率和截距
+    slope_low = (v2[1] - v1[1]) / (v2[0] - v1[0]) if (v2[0] - v1[0]) != 0 else 0
+    low_line_x = [v1[0], klines['x_pos'].iloc[-1]]  # 延伸到最后一根K线
+    low_line_y = [v1[1], v2[1] + slope_low * (klines['x_pos'].iloc[-1] - v2[0])]
+
+    # 绘制低点趋势延长线
+    ax_kline.plot(low_line_x, low_line_y, color='teal', linestyle='-', linewidth=2.5, alpha=0.9, label='低点趋势延长线')
+
+    # 计算两条延长线的交点
+    intersection = line_intersection(p1, (klines['x_pos'].iloc[-1], high_line_y[1]), v1, (klines['x_pos'].iloc[-1], low_line_y[1]))
+
+    if intersection is not None:
+        x_intersect, y_intersect = intersection
+        last_x_pos = klines['x_pos'].iloc[-1]
+
+        # 判断是否为未来交叉（交点在当前数据右侧）
+        print(x_intersect, y_intersect, last_x_pos)
+        if x_intersect > last_x_pos:
+            # 验证交点价格是否在某根K线的high和low之间
+            valid = False
+            for i in range(len(klines)):
+                if (
+                        klines['low'].iloc[i] <= y_intersect <= klines['high'].iloc[i]
+                        or klines['low'].iloc[i] >= y_intersect >= klines['high'].iloc[i]
+                ):
+                    valid = True
+                    break
+
+            if valid:
+                # # 计算预测的日期（线性插值）
+                # date_range = pd.to_datetime(klines['date']).values
+                # first_date = date_range[0].astype('datetime64[D]')
+                # last_date = date_range[-1].astype('datetime64[D]')
+                # total_days = (last_date - first_date).astype(int)
+                # days_per_step = total_days / (len(klines) - 1) if len(klines) > 1 else 1
+                # predicted_day = first_date + np.timedelta64(int(x_intersect * days_per_step), 'D')
+                #
+                # try:
+                #     predicted_date_str = predicted_day.strftime('%Y-%m-%d')
+                # except:
+                #     predicted_date_str = f"Day{x_intersect:.1f}"
+
+                # ✅ 修正：将 x_intersect 转换为实际日期
+                # 方法：将浮点索引四舍五入到最近的整数索引
+                intersect_index = int(round(x_intersect))
+                # 确保索引在有效范围内
+                if 0 <= intersect_index < len(klines):
+                    # 从klines中获取实际日期
+                    actual_date = klines['date'].iloc[intersect_index]
+                    date_str = actual_date.strftime('%Y-%m-%d')
+                else:
+                    # 理论上不会发生，因为x_intersect <= last_x_pos
+                    date_str = f"索引{intersect_index}"
+
+                # 在图上标注预测交点
+                ax_kline.scatter(x_intersect, y_intersect, color='darkred', s=150, marker='x', zorder=10, linewidth=3)
+                ax_kline.annotate(f'预测交叉\n{date_str}\n价格: {y_intersect:.2f}',
+                                  (x_intersect, y_intersect),
+                                  xytext=(10, -15),
+                                  textcoords='offset points',
+                                  fontsize=9,
+                                  color='darkred',
+                                  bbox=dict(boxstyle='round,pad=0.5', facecolor='lightcoral', alpha=0.8),
+                                  arrowprops=dict(arrowstyle='->', color='darkred', lw=1.5))
+
+                print(f"\n✅ 预测趋势线未来交叉:")
+                print(f"预测日期: {date_str}, 价格: {y_intersect:.2f}")
+            else:
+                print(f"\n⚠️  虽然计算出交点，但价格不在任何K线的high和low之间，交点无效。")
+        else:
+            print(f"\nℹ️  趋势线已在历史或当前交叉，位置: x={x_intersect:.1f}, 价格={y_intersect:.2f}")
+    else:
+        print(f"\nℹ️  高/低点趋势线无交点（可能平行）。")
+else:
+    missing = "高点" if len(filtered_peaks) < 2 else ""
+    missing += "和" if (len(filtered_peaks) < 2 and len(filtered_valleys) < 2) else ""
+    missing += "低点" if len(filtered_valleys) < 2 else ""
+    print(f"\nℹ️  无法绘制趋势线：{missing}不足两个（过滤后）。")
+
 # ====== 3. 绘制成交量 ======
 vol_width = candle_width * 1
 for idx, row in klines.iterrows():
@@ -395,7 +529,7 @@ ax_vol.plot(klines['x_pos'], klines['hist_ma'],
 ax_vol.plot(klines['x_pos'], klines['locked_threshold'],
             '--', color='purple', lw=1, alpha=0.5, label='锁定阈值')
 
-# ====== 4. 新增：多空力量分析图 ======
+# ====== 4. 新增：多空力度分析图 ======
 # ====== 统一计算技术指标 ======
 klines['Body'] = abs(klines['close'] - klines['open'])
 klines['UpperShadow'] = klines['high'] - np.maximum(klines['open'], klines['close'])
@@ -414,24 +548,18 @@ klines['ATR'] = klines['TR'].ewm(alpha=1/atr_window, adjust=False).mean()
 klines['DynamicThreshold'] = klines['ATR'] * 0.3
 
 # 4.3 绘制
-ax_power.bar(klines['x_pos'] - 0.2, klines['UpperShadow'], width=0.4, color='orange', label='上影线', alpha=0.7)
-ax_power.bar(klines['x_pos'] + 0.2, -klines['LowerShadow'], width=0.4, color='cyan', label='下影线', alpha=0.7)
-ax_power.bar(klines['x_pos'], klines['PowerDiff'], width=0.6, color=np.where(klines['PowerDiff'] > 0, 'red', 'green'), alpha=0.5, label='力量差')
+ax_power.bar(klines['x_pos'] - 0.2, klines['BuyPower'], width=0.4, color='orange', label='主动买入', alpha=0.7)
+ax_power.bar(klines['x_pos'] + 0.2, -klines['SellPower'], width=0.4, color='cyan', label='主动卖出', alpha=0.7)
+ax_power.bar(klines['x_pos'], klines['PowerDiff'], width=0.6, color=np.where(klines['PowerDiff'] > 0, 'red', 'green'), alpha=0.5, label='力度差')
 ax_power.plot(klines['x_pos'], klines['DynamicThreshold'], color='purple', linestyle='-', linewidth=1.5, label='动态阈值')
 ax_power.plot(klines['x_pos'], -klines['DynamicThreshold'], color='purple', linestyle='-', linewidth=1.5)
 ax_power.axhline(0, color='gray', linestyle='--', linewidth=0.8)
-ax_power.set_ylabel('多空力量')
+ax_power.set_ylabel('多空力度')
 ax_power.legend(loc='upper right', fontsize=9)
 ax_power.grid(True, alpha=0.3)
 
 # ====== 新增：长影线预警（避免与P/V三角重合）======
 if SHOW_SHADOW:
-    # # ====== 调试：打印影线与实体的比值 ======
-    # print("\n影线/实体比值（最后10根K线）：")
-    # debug_df = klines[['date', 'Body', 'UpperShadow', 'LowerShadow']].copy()
-    # debug_df['U/B'] = debug_df['UpperShadow'] / (debug_df['Body'] + 1e-8)  # 防止除零
-    # debug_df['L/B'] = debug_df['LowerShadow'] / (debug_df['Body'] + 1e-8)
-    #print(debug_df.tail(10))
     # 2. 定义“中等K线”阈值（基于价格百分比）
     price_level = klines['close'].median()  # 用中位数作为参考价格
     min_body_pct = 0.005  # 最小体幅：0.5%
@@ -485,7 +613,7 @@ ax_kline.set_ylim(
     klines[['high', 'ma5', 'ma10', 'ma20']].max().max() * 1.005
 )
 ax_vol.set_ylim(0, klines['volume'].max() * 1.2)
-ax_power.set_ylim(-klines['UpperShadow'].max() * 1.3, klines['UpperShadow'].max() * 1.3)  # 力量图y轴
+ax_power.set_ylim(-klines['UpperShadow'].max() * 1.3, klines['UpperShadow'].max() * 1.3)  # 力度图y轴
 
 # ====== ✅ 正确设置x轴标签：只在最下面的子图显示 ======
 ax_kline.set_xlim(-0.5, len(klines) - 0.5)
@@ -498,7 +626,7 @@ ax_vol.set_ylim(0, klines['volume'].max() * 1.2)
 # ❌ 关闭上面的标签显示
 ax_kline.set_xticklabels([])
 
-# 如果有力量图 ax_power，则重复上述逻辑
+# 如果有力度图 ax_power，则重复上述逻辑
 if 'ax_power' in locals():
     ax_power.set_xticks(klines['x_pos'])
     ax_power.set_xticklabels(klines['date'].dt.strftime('%Y-%m-%d'), rotation=45, ha='right')
@@ -508,9 +636,9 @@ if 'ax_power' in locals():
 ax_kline.legend(loc='upper left')
 ax_vol.legend(loc='upper left')
 ax_power.legend(loc='upper left')
-ax_kline.set_title(f'{name}({code}) CT模型+堆量{period_name}线 + 买卖力量分析', pad=20, fontsize=14)
+ax_kline.set_title(f'{name}({code}) CT模型+堆量{period_name}线 + 买卖力度分析', pad=20, fontsize=14)
 ax_vol.set_ylabel('成交量(手)')
-ax_power.set_ylabel('力量分析')
+ax_power.set_ylabel('力度分析')
 
 plt.subplots_adjust(left=0.1, right=0.85, hspace=0.1, bottom=0.15)  # 增加底部空间以容纳日期
 plt.show()
