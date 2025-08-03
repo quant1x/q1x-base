@@ -10,10 +10,10 @@
 """
 import akshare as ak
 
-option_finance_board_df = ak.option_finance_board(symbol="沪深300股指期权", end_month="2508")
+option_finance_board_df = ak.option_finance_board(symbol="华泰柏瑞沪深300ETF期权", end_month="2512")
 print(option_finance_board_df.columns)
-print(option_finance_board_df.head())
-print(option_finance_board_df.tail())
+print('------')
+print(option_finance_board_df)
 
 import akshare as ak
 
