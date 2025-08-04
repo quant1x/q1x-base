@@ -10,7 +10,7 @@ from q1x.base import cache
 # -------------------------------
 target_period = 'd'      # 周期：日线
 target_tail = 0          # 尾部数据量
-code = 'sh603488'        # 股票代码
+code = 'sz000158'        # 股票代码
 name = cache.stock_name(code)
 print(f'{name}({code})')
 
@@ -27,7 +27,7 @@ klines['date'] = pd.to_datetime(klines['date'])
 klines['x_pos'] = np.arange(len(klines))
 
 # 确保数值类型并处理可能的异常值
-for col in ['open', 'high', 'low', 'close']:  # 注意：Garman-Klass 需要开盘价
+for col in ['open', 'high', 'low', 'close']:  # Rogers-Satchell 需要开盘价
     if col not in klines.columns:
         print(f"❌ 数据缺少必要列: {col}")
         # 如果没有开盘价，可能需要从其他地方获取或用其他方式估算
@@ -38,27 +38,27 @@ for col in ['open', 'high', 'low', 'close']:  # 注意：Garman-Klass 需要开�
     klines[col] = klines[col].clip(lower=1e-10)
 
 # -------------------------------
-# 3. 计算个股“伪VIX” (使用 Garman-Klass 波动率)
+# 3. 计算个股“伪VIX” (使用 Rogers-Satchell 波动率)
 # -------------------------------
 window = 20  # 20日滚动窗口
 
-# 计算 ln(High / Low) 和 ln(Close / Open)
-klines['ln_HL'] = np.log(klines['high'] / klines['low'])
+# 计算 ln(High / Close), ln(Low / Close), ln(Close / Open)
+klines['ln_HC'] = np.log(klines['high'] / klines['close'])
+klines['ln_LC'] = np.log(klines['low'] / klines['close'])
 klines['ln_CO'] = np.log(klines['close'] / klines['open'])
 
-# Garman-Klass 方差 (日度)
-# 公式: 0.5 * ln(H/L)^2 - (2*ln(2)-1) * ln(C/O)^2
-# 其中 2*ln(2)-1 ≈ 0.386294
-klines['gk_var_daily'] = 0.5 * klines['ln_HL']**2 - 0.386294 * klines['ln_CO']**2
+# Rogers-Satchell 方差 (日度)
+klines['rs_var_daily'] = klines['ln_HC'] * (klines['ln_HC'] + klines['ln_CO']) + \
+                         klines['ln_LC'] * (klines['ln_LC'] + klines['ln_CO'])
 
 # 滚动均值（相当于方差）
-rolling_gk_var = klines['gk_var_daily'].rolling(window=window, min_periods=1).mean()
+rolling_rs_var = klines['rs_var_daily'].rolling(window=window, min_periods=1).mean()
 
 # 年化波动率（标准差）
-klines['HV_GarmanKlass'] = np.sqrt(rolling_gk_var) * np.sqrt(252)  # 年化
+klines['HV_RogersSatchell'] = np.sqrt(rolling_rs_var) * np.sqrt(252)  # 年化
 
 # 转为百分比（类似 VIX）
-klines['Pseudo_VIX'] = klines['HV_GarmanKlass'] * 100
+klines['Pseudo_VIX'] = klines['HV_RogersSatchell'] * 100
 
 # ✅ 使用 bfill() 替代 fillna(method='bfill')
 klines['Pseudo_VIX'] = klines['Pseudo_VIX'].bfill()  # 向后填充（用后面的值填前面）
@@ -106,13 +106,16 @@ else:
     suggestion = "波动率处于正常范围，按常规策略操作。"
 
 # -------------------------------
-# 6. 可视化 (增强版)
+# 6. 可视化 (增强版) - 主图叠加收盘价
 # -------------------------------
-fig, axes = plt.subplots(2, 1, figsize=(14, 10), sharex=True, gridspec_kw={'height_ratios': [3, 1]})
+# 创建双Y轴图表
+fig, ax1 = plt.subplots(figsize=(14, 8))
 
-# 主图：波动率
-ax1 = axes[0]
-ax1.plot(klines['date'], klines['Pseudo_VIX'], label="Pseudo-VIX (Garman-Klass Vol)", color="red", linewidth=2)
+# 主图1 (左侧Y轴): 波动率
+color = 'tab:red'
+ax1.set_xlabel('日期', fontsize=12)
+ax1.set_ylabel('波动率 (%)', color=color, fontsize=12)
+ax1.plot(klines['date'], klines['Pseudo_VIX'], label="Pseudo-VIX (Rogers-Satchell Vol)", color=color, linewidth=2)
 ax1.axhline(y=klines['Pseudo_VIX'].mean(), color="blue", linestyle="--", label="长期均值")
 
 # 如果计算了置信区间，则绘制
@@ -122,32 +125,25 @@ if 'CI_upper' in klines.columns and 'CI_lower' in klines.columns:
     ax1.plot(klines['date'], klines['CI_upper'], color="gray", linestyle="--", alpha=0.7)
     ax1.plot(klines['date'], klines['CI_lower'], color="gray", linestyle="--", alpha=0.7)
 
-# 标记当前值
-ax1.axhline(y=latest_vix, color="red", linestyle=":", alpha=0.7, label=f"当前: {latest_vix:.2f}")
-
-ax1.set_title(f"{name}({code}) - 个股波动率指数 (Pseudo-VIX)", fontsize=14, fontweight='bold')
-ax1.set_ylabel("波动率 (%)", fontsize=12)
-ax1.legend(fontsize=10)
+# 标记当前波动率
+ax1.axhline(y=latest_vix, color=color, linestyle=":", alpha=0.7, label=f"当前波动率: {latest_vix:.2f}")
+ax1.tick_params(axis='y', labelcolor=color)
 ax1.grid(True, alpha=0.3)
+ax1.legend(loc='upper left', fontsize=10)
 
-# 副图：历史分位数状态
-ax2 = axes[1]
-# 将布尔值转换为数值进行绘图
-quantile_5_numeric = klines['HV_quantile_5'].astype(float).fillna(0)
-quantile_95_numeric = klines['HV_quantile_95'].astype(float).fillna(0)
+# 主图2 (右侧Y轴): 股价收盘价
+ax2 = ax1.twinx()  # 共享X轴
+color = 'tab:blue'
+ax2.set_ylabel('股价 (元)', color=color, fontsize=12)
+ax2.plot(klines['date'], klines['close'], label="收盘价", color=color, linewidth=1.5, alpha=0.8)
+ax2.tick_params(axis='y', labelcolor=color)
+ax2.legend(loc='upper right', fontsize=10)
 
-ax2.fill_between(klines['date'], 0, 1, where=quantile_5_numeric, color='green', alpha=0.3, label='低于 5%')
-ax2.fill_between(klines['date'], 0, 1, where=quantile_95_numeric, color='red', alpha=0.3, label='高于 95%')
+# 设置标题
+plt.title(f"{name}({code}) - 个股波动率指数与股价联动分析", fontsize=14, fontweight='bold')
 
-ax2.set_ylabel("分位状态", fontsize=12)
-ax2.set_xlabel("日期", fontsize=12)
-ax2.legend(fontsize=10)
-ax2.grid(True, alpha=0.3)
-ax2.set_ylim(0, 1)
-ax2.set_yticks([0.25, 0.75])
-ax2.set_yticklabels(['低位', '高位'])
-
-plt.tight_layout()
+# 调整布局
+fig.tight_layout()
 plt.show()
 
 # -------------------------------

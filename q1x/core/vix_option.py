@@ -197,65 +197,65 @@ def bs_price(S, K, T, r, sigma, option_type='C'):
 # -------------------------------
 # 5. 计算“恐慌指数”（类VIX）(使用真实时间)
 # -------------------------------
-def calculate_vix_like(df_300):
-    """
-    计算类VIX指数（基于近月+次近月期权的加权插值）
-    """
-    # 按到期日分组
-    exp_groups = df_300.groupby('EXPIRE_CODE')
-    if len(exp_groups) < 2:
-        print("⚠️ 数据不足两个到期日，使用所有数据平均")
-        return df_300['IMPLC_VOLATLTY'].mean() * 100
-
-    all_expirations = sorted(exp_groups.groups.keys())
-    near_exp = all_expirations[0]
-    next_exp = all_expirations[1]
-    near_term = exp_groups.get_group(near_exp)
-    next_term = exp_groups.get_group(next_exp)
-
-    def get_atm_weighted_iv(group):
-        if 'C' in group['TYPE'].values:
-            atm_call = group[group['TYPE'] == 'C'].iloc[(group[group['TYPE']=='C']['DELTA_VALUE'] - 0.5).abs().argsort()[:3]]
-        else:
-            atm_call = pd.DataFrame()
-        if 'P' in group['TYPE'].values:
-            atm_put = group[group['TYPE'] == 'P'].iloc[(group[group['TYPE']=='P']['DELTA_VALUE'] + 0.5).abs().argsort()[:3]]
-        else:
-            atm_put = pd.DataFrame()
-        combined = pd.concat([atm_call, atm_put])
-        if len(combined) == 0:
-            return group['IMPLC_VOLATLTY'].mean()
-        return combined['IMPLC_VOLATLTY'].mean()
-
-    iv_near = get_atm_weighted_iv(near_term)
-    iv_next = get_atm_weighted_iv(next_term)
-
-    # --- 计算真实剩余时间 ---
-    def get_T_days(exp_code):
-        # 解析 'M08' -> 8月
-        month = int(exp_code[1:3])
-        # 计算当月第四个周三
-        from datetime import date
-        first_day = date(2025, month, 1)
-        first_wed = first_day + timedelta(days=(2 - first_day.weekday()) % 7)
-        expire_date = first_wed + timedelta(weeks=3)
-        expire_datetime = datetime.combine(expire_date, datetime.min.time())
-        today = datetime(2025, 8, 1)
-        return (expire_datetime - today).days
-
-    T1 = get_T_days(near_exp) / 365.0
-    T2 = get_T_days(next_exp) / 365.0
-    TARGET_T = 30 / 365.0
-
-    # --- 使用正确的插值公式 ---
-    if T1 <= TARGET_T <= T2 and T2 > T1:
-        vix_squared = ((T2 - TARGET_T) / (T2 - T1)) * (iv_near**2) * (T1 / TARGET_T) + \
-                      ((TARGET_T - T1) / (T2 - T1)) * (iv_next**2) * (T2 / TARGET_T)
-        vix = np.sqrt(vix_squared)
-    else:
-        vix = iv_near
-
-    return vix * 100
+# def calculate_vix_like(df_300):
+#     """
+#     计算类VIX指数（基于近月+次近月期权的加权插值）
+#     """
+#     # 按到期日分组
+#     exp_groups = df_300.groupby('EXPIRE_CODE')
+#     if len(exp_groups) < 2:
+#         print("⚠️ 数据不足两个到期日，使用所有数据平均")
+#         return df_300['IMPLC_VOLATLTY'].mean() * 100
+#
+#     all_expirations = sorted(exp_groups.groups.keys())
+#     near_exp = all_expirations[0]
+#     next_exp = all_expirations[1]
+#     near_term = exp_groups.get_group(near_exp)
+#     next_term = exp_groups.get_group(next_exp)
+#
+#     def get_atm_weighted_iv(group):
+#         if 'C' in group['TYPE'].values:
+#             atm_call = group[group['TYPE'] == 'C'].iloc[(group[group['TYPE']=='C']['DELTA_VALUE'] - 0.5).abs().argsort()[:3]]
+#         else:
+#             atm_call = pd.DataFrame()
+#         if 'P' in group['TYPE'].values:
+#             atm_put = group[group['TYPE'] == 'P'].iloc[(group[group['TYPE']=='P']['DELTA_VALUE'] + 0.5).abs().argsort()[:3]]
+#         else:
+#             atm_put = pd.DataFrame()
+#         combined = pd.concat([atm_call, atm_put])
+#         if len(combined) == 0:
+#             return group['IMPLC_VOLATLTY'].mean()
+#         return combined['IMPLC_VOLATLTY'].mean()
+#
+#     iv_near = get_atm_weighted_iv(near_term)
+#     iv_next = get_atm_weighted_iv(next_term)
+#
+#     # --- 计算真实剩余时间 ---
+#     def get_T_days(exp_code):
+#         # 解析 'M08' -> 8月
+#         month = int(exp_code[1:3])
+#         # 计算当月第四个周三
+#         from datetime import date
+#         first_day = date(2025, month, 1)
+#         first_wed = first_day + timedelta(days=(2 - first_day.weekday()) % 7)
+#         expire_date = first_wed + timedelta(weeks=3)
+#         expire_datetime = datetime.combine(expire_date, datetime.min.time())
+#         today = datetime(2025, 8, 1)
+#         return (expire_datetime - today).days
+#
+#     T1 = get_T_days(near_exp) / 365.0
+#     T2 = get_T_days(next_exp) / 365.0
+#     TARGET_T = 30 / 365.0
+#
+#     # --- 使用正确的插值公式 ---
+#     if T1 <= TARGET_T <= T2 and T2 > T1:
+#         vix_squared = ((T2 - TARGET_T) / (T2 - T1)) * (iv_near**2) * (T1 / TARGET_T) + \
+#                       ((TARGET_T - T1) / (T2 - T1)) * (iv_next**2) * (T2 / TARGET_T)
+#         vix = np.sqrt(vix_squared)
+#     else:
+#         vix = iv_near
+#
+#     return vix * 100
 
 # -------------------------------
 # ✅ 真实 VIX 计算函数（CBOE 官方逻辑）
