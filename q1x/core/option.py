@@ -95,7 +95,6 @@ def option_finance_board(
             params=SH_OPTION_PAYLOAD_OTHER,
         )
         data_json = r.json()
-        print(data_json)
         raw_data = pd.DataFrame(data_json["list"])
         raw_data.index = [str(data_json["date"]) + str(data_json["time"])] * data_json[
             "total"
