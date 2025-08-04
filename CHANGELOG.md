@@ -3,10 +3,37 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.8] - 2025-08-04
+### Changed
+- 调整波浪检测方法
+- 新增对绘图库的依赖
+- 新增股票波浪结构测试代码
+- 优化最近C点的算法，优化力度分析
+- 适配新版本plot函数的标题
+- 调整力量子图的图例在左侧
+- 新增期权数据测试代码
+- 新增部分依赖库
+- 新增核心因子
+- 新增移动平均波动率算法
+- 优化算法
+- 新增美股VIX恐慌指数算法
+- 修改期权数据的参数
+- 增加vix的测试代码
+- 增加盘前集合竞价测试代码
+- 新增期权数据接口
+- 修订包引入
+- 去掉临时输出json的调试代码
+- 修正在markdown中的符号显示
+- 删除废弃的代码
+- 优化个股vix
+- 调整测试代码
+- 调整vix算法
+
 ## [0.6.7] - 2025-07-29
 ### Changed
 - 新增核心功能包, 增加波浪检测工具
 - 新增MA移动平均线, window_shift>0均线做shift操作, 且数据集合长度大于0小于滑动窗口N也做算数平均
+- update changelog
 
 ## [0.6.6] - 2025-07-29
 ### Changed
@@ -304,7 +331,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.7...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.8...HEAD
+[0.6.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.7...v0.6.8
 [0.6.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.6...v0.6.7
 [0.6.6]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.5...v0.6.6
 [0.6.5]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.4...v0.6.5
