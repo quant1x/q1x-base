@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 @Project : q1x-base
-@Package : 
+@Package : core
 @File    : option.py
 @Author  : wangfeng
 @Date    : 2025/8/4 5:57
-@Desc    : 
+@Desc    : 期权数据
 """
+from io import BytesIO
+
 import pandas as pd
 import requests
 
