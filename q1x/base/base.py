@@ -62,7 +62,7 @@ class Quant1XConfig:
 
         if not self.data_path:
             self.data_path = os.path.join(self.__default_main_path, 'data')
-
+        self.data_path= os.path.expanduser(self.data_path)
         # 数据路径
         self.kline_path = os.path.join(self.data_path, 'day')
         """str: K线路径 """
