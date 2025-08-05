@@ -9,9 +9,79 @@
 @Desc    : 波浪检测
 """
 
+from operator import lt, le, gt, ge
 from typing import List, Tuple
 
 import numpy as np
+
+
+def filter_sequence(arr, op:str='<='):
+    """
+    过滤数组，保留值升序且索引连续的元素
+
+    Parameters:
+        arr (list): 输入数组
+        op (str): 比较符号
+
+    Returns:
+        list: 过滤后的数组
+    """
+    if not arr:
+        return []
+
+    filtered = [arr[0]]
+    last_value = arr[0]
+
+    cmp = {
+        '<': lt,
+        '<=': le,
+        '>': gt,
+        '>=': ge,
+    }
+    compare = cmp.get(op, lt)
+
+    for num in arr[1:]:
+        if compare(last_value, num):
+            filtered.append(num)
+            last_value = num
+
+    return filtered
+
+
+def filter_sequence_with_indices(arr, op:str='<='):
+    """
+    过滤数组，返回符合升序条件的元素及其原索引
+
+    Parameters:
+        arr (list): 输入数组
+        op (str): 比较符号
+
+    Returns:
+        tuple: (values, indices)
+    """
+    if not arr:
+        return [], []
+
+    cmp = {
+        '<': lt,
+        '<=': le,
+        '>': gt,
+        '>=': ge,
+    }
+    compare = cmp.get(op, lt)
+
+    values = [arr[0]]
+    indices = [0]
+    last_value = arr[0]
+
+    for i in range(1, len(arr)):
+        num = arr[i]
+        if compare(last_value, num):
+            values.append(num)
+            indices.append(i)
+            last_value = num
+
+    return values, indices
 
 
 def _compare(a: float, b: float) -> int:
@@ -415,66 +485,6 @@ def standardize_peaks_valleys(peaks, valleys, high_list, low_list):
                 current_type = 'peak'
 
     return standard_peaks, standard_valleys
-
-
-def standardize_peaks_valleys_v2(peaks, valleys, high_list, low_list):
-    """
-    标准化波峰波谷序列，确保严格交替出现
-    参数:
-        peaks: 原始波峰索引列表
-        valleys: 原始波谷索引列表
-        high_list: 高价序列（用于比较高度）
-        low_list: 低价序列（用于比较低点）
-    返回:
-        (standard_peaks, standard_valleys)
-    """
-    # 确保交替出现
-    extrema = sorted([(p, 'peak') for p in peaks] + [(v, 'valley') for v in valleys],
-                     key=lambda x: x[0])
-
-    final_peaks = []
-    final_valleys = []
-
-    if not extrema:
-        return final_peaks, final_valleys
-
-    # 使用栈的方式来处理，确保交替出现
-    result = []
-
-    for idx, typ in extrema:
-        if not result:
-            # 第一个点直接添加
-            result.append((idx, typ))
-            if typ == 'peak':
-                final_peaks.append(idx)
-            else:
-                final_valleys.append(idx)
-        else:
-            last_idx, last_type = result[-1]
-
-            if typ != last_type:
-                # 类型不同，可以添加
-                result.append((idx, typ))
-                if typ == 'peak':
-                    final_peaks.append(idx)
-                else:
-                    final_valleys.append(idx)
-            else:
-                # 类型相同，需要合并（保留更显著的）
-                if typ == 'peak':
-                    # 保留更高的波峰
-                    if high_list[idx] > high_list[last_idx]:
-                        # 替换最后一个波峰
-                        result[-1] = (idx, typ)
-                        final_peaks[-1] = idx
-                else:
-                    # 保留更低的波谷
-                    if low_list[idx] < low_list[last_idx]:
-                        # 替换最后一个波谷
-                        result[-1] = (idx, typ)
-                        final_valleys[-1] = idx
-
-    return final_peaks, final_valleys
 
 
 def build_wave_segments(high_list, peaks, valleys):
