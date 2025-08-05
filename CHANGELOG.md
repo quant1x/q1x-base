@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.12] - 2025-08-05
+### Changed
+- 修订option_finance_board返回值类型
+
 ## [0.6.11] - 2025-08-05
 ### Changed
 - 更新依赖库版本setuptools设定78.0.0这个版本, 防止出现异常告警pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html.   The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+- update changelog
 
 ## [0.6.10] - 2025-08-05
 ### Changed
@@ -347,7 +352,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.11...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.12...HEAD
+[0.6.12]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.11...v0.6.12
 [0.6.11]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.10...v0.6.11
 [0.6.10]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.9...v0.6.10
 [0.6.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.8...v0.6.9
