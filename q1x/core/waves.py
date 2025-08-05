@@ -245,6 +245,7 @@ def detect_peaks_and_valleys_v1(high_list, low_list):
 
     return sorted(peaks), sorted(valleys)
 
+
 def detect_peaks_and_valleys_v2(high_list, low_list):
     """
     严格保持与原函数完全相同的输出结果：
@@ -265,25 +266,25 @@ def detect_peaks_and_valleys_v2(high_list, low_list):
     max_idx = high_list.index(max_val)
 
     # 仅将find_monotonic_peaks替换为find_monotonic_extremes
-    left_peaks = find_monotonic_extremes(high_list[:max_idx+1], 'left', 'peak')  # 仅改函数名
-    right_peaks = [max_idx+1+i for i in
-                   find_monotonic_extremes(high_list[max_idx+1:], 'right', 'peak')]  # 仅改函数名
+    left_peaks = find_monotonic_extremes(high_list[:max_idx + 1], 'left', 'peak')  # 仅改函数名
+    right_peaks = [max_idx + 1 + i for i in
+                   find_monotonic_extremes(high_list[max_idx + 1:], 'right', 'peak')]  # 仅改函数名
     raw_peaks = left_peaks + right_peaks
 
     # 相邻高点过滤
     peaks = []
     for i in range(len(raw_peaks)):
-        if i == 0 or raw_peaks[i] != raw_peaks[i-1] + 1:
+        if i == 0 or raw_peaks[i] != raw_peaks[i - 1] + 1:
             peaks.append(raw_peaks[i])
-        elif high_list[raw_peaks[i]] > high_list[raw_peaks[i-1]]:
+        elif high_list[raw_peaks[i]] > high_list[raw_peaks[i - 1]]:
             peaks[-1] = raw_peaks[i]
 
     # 第二阶段：波谷检测
     valleys = []
-    for i in range(len(peaks)-1):
-        start, end = peaks[i], peaks[i+1]
+    for i in range(len(peaks) - 1):
+        start, end = peaks[i], peaks[i + 1]
         if end - start > 1:
-            between = low_list[start+1:end]
+            between = low_list[start + 1:end]
             min_idx = start + 1 + between.index(min(between))
             valleys.append(min_idx)
 
@@ -291,11 +292,12 @@ def detect_peaks_and_valleys_v2(high_list, low_list):
     if peaks:
         if peaks[0] > 0:
             valleys.append(low_list.index(min(low_list[:peaks[0]])))
-        if peaks[-1] < len(low_list)-1:
-            right_min = min(low_list[peaks[-1]+1:])
-            valleys.append(peaks[-1]+1 + low_list[peaks[-1]+1:].index(right_min))
+        if peaks[-1] < len(low_list) - 1:
+            right_min = min(low_list[peaks[-1] + 1:])
+            valleys.append(peaks[-1] + 1 + low_list[peaks[-1] + 1:].index(right_min))
 
     return sorted(peaks), sorted(valleys)  # 保持原排序方式
+
 
 def detect_peaks_and_valleys_v3(high_list: List[float], low_list: List[float]) -> Tuple[List[int], List[int]]:
     """
@@ -397,6 +399,38 @@ def detect_peaks_and_valleys_v3(high_list: List[float], low_list: List[float]) -
     # 返回排序结果（原函数最后排序）
     return sorted(peaks), sorted(valleys)
 
+
+def find_monotonic_peaks_around_max(lst: List[float]) -> List[int]:
+    max_val = max(lst)
+    max_idx = lst.index(max_val)
+    left = find_monotonic_extremes(lst[:max_idx + 1], 'left', 'peak')
+    right = [max_idx + 1 + i for i in find_monotonic_extremes(lst[max_idx + 1:], 'right', 'peak')]
+    raw = left + right
+    # 去重：相邻索引保留更高者
+    peaks = []
+    for idx in raw:
+        if not peaks or idx != peaks[-1] + 1:
+            peaks.append(idx)
+        elif lst[idx] > lst[peaks[-1]]:
+            peaks[-1] = idx
+    return peaks
+
+
+def find_monotonic_valleys_around_min(lst: List[float]) -> List[int]:
+    min_val = min(lst)
+    min_idx = lst.index(min_val)
+    left = find_monotonic_extremes(lst[:min_idx + 1], 'left', 'valley')
+    right = [min_idx + 1 + i for i in find_monotonic_extremes(lst[min_idx + 1:], 'right', 'valley')]
+    raw = left + right
+    # 去重：相邻索引保留更低者
+    valleys = []
+    for idx in raw:
+        if not valleys or idx != valleys[-1] + 1:
+            valleys.append(idx)
+        elif lst[idx] < lst[valleys[-1]]:
+            valleys[-1] = idx
+    return valleys
+
 def detect_peaks_and_valleys(high_list: List[float], low_list: List[float]) -> Tuple[List[int], List[int]]:
     """
     检测并交叉验证波峰与波谷，确保交替性。
@@ -432,42 +466,11 @@ def detect_peaks_and_valleys(high_list: List[float], low_list: List[float]) -> T
     if len(high_list) == 1 and len(low_list) == 1:
         return [0], [0]
 
-
     # ====================
     # 第一阶段：独立检测波峰（high）和波谷（low）
     # ====================
-    def get_peaks(lst: List[float]) -> List[int]:
-        max_val = max(lst)
-        max_idx = lst.index(max_val)
-        left = find_monotonic_extremes(lst[:max_idx + 1], 'left', 'peak')
-        right = [max_idx + 1 + i for i in find_monotonic_extremes(lst[max_idx + 1:], 'right', 'peak')]
-        raw = left + right
-        # 去重：相邻索引保留更高者
-        peaks = []
-        for idx in raw:
-            if not peaks or idx != peaks[-1] + 1:
-                peaks.append(idx)
-            elif lst[idx] > lst[peaks[-1]]:
-                peaks[-1] = idx
-        return peaks
-
-    def get_valleys(lst: List[float]) -> List[int]:
-        min_val = min(lst)
-        min_idx = lst.index(min_val)
-        left = find_monotonic_extremes(lst[:min_idx + 1], 'left', 'valley')
-        right = [min_idx + 1 + i for i in find_monotonic_extremes(lst[min_idx + 1:], 'right', 'valley')]
-        raw = left + right
-        # 去重：相邻索引保留更低者
-        valleys = []
-        for idx in raw:
-            if not valleys or idx != valleys[-1] + 1:
-                valleys.append(idx)
-            elif lst[idx] < lst[valleys[-1]]:
-                valleys[-1] = idx
-        return valleys
-
-    peaks = get_peaks(high_list)
-    valleys = get_valleys(low_list)
+    peaks = find_monotonic_peaks_around_max(high_list)
+    valleys = find_monotonic_valleys_around_min(low_list)
 
     if not peaks or not valleys:
         return sorted(peaks), sorted(valleys)
@@ -560,6 +563,7 @@ def detect_peaks_and_valleys(high_list: List[float], low_list: List[float]) -> T
     final_valleys = [idx for t, idx in cleaned if t == 'valley']
 
     return sorted(final_peaks), sorted(final_valleys)
+
 
 def standardize_peaks_valleys(peaks, valleys, high_list, low_list):
     """
