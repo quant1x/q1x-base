@@ -205,6 +205,24 @@ def calendar() -> pd.Series:
     return __calendar()
 
 
+def fix_trade_date(date_str: str, fmt: str = "%Y-%m-%d") -> str:
+    """强制将日期字符串转换为指定格式
+
+    参数:
+        date_str: 输入日期字符串
+        fmt: 目标格式（默认%Y-%m-%d）
+
+    返回:
+        统一格式的日期字符串
+
+    示例:
+        >>> fix_trade_date("2023/12/25")
+        "2023-12-25"
+    """
+    from datetime import datetime
+    return datetime.strptime(date_str, "%Y-%m-%d").strftime(fmt) if date_str else date_str
+
+
 def get_today() -> str:
     """
     获取当前日期
@@ -266,6 +284,7 @@ def last_trade_date(base_date: str = None) -> str:
     # 确保返回字符串
     return str(date) if not isinstance(date, str) else date
 
+
 def front_trade_date(n: int = 1, base_date: str = None) -> str:
     """获取基准日期前N个交易日
 
@@ -282,6 +301,7 @@ def front_trade_date(n: int = 1, base_date: str = None) -> str:
 
     return str(dates.iat[max(0, int(idx) - n)])
 
+
 def next_trade_date(base_date: str = None) -> str:
     """获取基准日期后的下一个交易日
 
@@ -295,7 +315,8 @@ def next_trade_date(base_date: str = None) -> str:
     idx = dates.searchsorted(ref_date, side='right')
     idx = idx[0] if hasattr(idx, '__iter__') else idx
 
-    return str(dates.iloc[min(int(idx), len(dates)-1)])
+    return str(dates.iloc[min(int(idx), len(dates) - 1)])
+
 
 if __name__ == '__main__':
     # 获取市场代码
