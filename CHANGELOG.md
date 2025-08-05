@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.10] - 2025-08-05
+### Changed
+- 增加git仓库忽略json文件
+- 更新依赖库版本
+
 ## [0.6.9] - 2025-08-04
 ### Changed
 - 修复路径~不能证券转换的问题
+- update changelog
 
 ## [0.6.8] - 2025-08-04
 ### Changed
@@ -336,7 +342,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.9...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.10...HEAD
+[0.6.10]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.9...v0.6.10
 [0.6.9]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.8...v0.6.9
 [0.6.8]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.7...v0.6.8
 [0.6.7]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.6...v0.6.7
