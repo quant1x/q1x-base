@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.13] - 2025-08-05
+### Changed
+- 优化交易日历的三个函数
+- 新增强制转换交易日期格式为%Y-%m-%d,保持和交易日历中日期格式一致
+
 ## [0.6.12] - 2025-08-05
 ### Changed
 - 修订option_finance_board返回值类型
+- update changelog
 
 ## [0.6.11] - 2025-08-05
 ### Changed
@@ -352,7 +358,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.12...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.13...HEAD
+[0.6.13]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.12...v0.6.13
 [0.6.12]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.11...v0.6.12
 [0.6.11]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.10...v0.6.11
 [0.6.10]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.9...v0.6.10
