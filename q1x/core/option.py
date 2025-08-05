@@ -12,7 +12,7 @@ from io import BytesIO
 
 import pandas as pd
 import requests
-
+from pandas import DataFrame
 
 # 中国金融期货交易所
 
@@ -48,7 +48,7 @@ SH_OPTION_PAYLOAD_OTHER = {"select": "contractid,last,chg_rate,presetpx,exepx"}
 
 def option_finance_board(
         symbol: str = "嘉实沪深300ETF期权", end_month: str = "2306"
-) -> pd.DataFrame:
+) -> DataFrame:
     """
     期权当前交易日的行情数据
     主要为三个: 华夏上证50ETF期权, 华泰柏瑞沪深300ETF期权, 嘉实沪深300ETF期权,
@@ -279,6 +279,8 @@ def option_finance_board(
         del raw_df["end_month"]
         raw_df.reset_index(inplace=True, drop=True)
         return raw_df
+    else:
+        return DataFrame()
 
 
 def option_risk_indicator_sse(date: str = "20240626") -> pd.DataFrame:
