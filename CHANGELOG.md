@@ -3,10 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.15] - 2025-08-05
+### Changed
+- 抽象出检测单调的波峰和波谷两个函数
+- 优化波浪检测代码结构
+
 ## [0.6.14] - 2025-08-05
 ### Changed
 - 删除废弃的代码
 - 新增获取f10数据
+- update changelog
 
 ## [0.6.13] - 2025-08-05
 ### Changed
@@ -364,7 +370,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.14...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.15...HEAD
+[0.6.15]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.14...v0.6.15
 [0.6.14]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.13...v0.6.14
 [0.6.13]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.12...v0.6.13
 [0.6.12]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.11...v0.6.12
