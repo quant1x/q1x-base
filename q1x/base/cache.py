@@ -3,6 +3,7 @@
 import json
 import os
 from functools import lru_cache
+from typing import Dict, Any
 
 import pandas as pd
 from dateutil import parser
@@ -10,6 +11,7 @@ from pandas import DataFrame
 
 from q1x.base import base
 from q1x.base import exchange
+from q1x.base.exchange import fix_trade_date
 
 
 @lru_cache(maxsize=None)
@@ -58,7 +60,8 @@ def klines(code: str) -> pd.DataFrame | None:
         return pd.read_csv(full_path)
     return None
 
-def get_period_name(period:str='D') -> str:
+
+def get_period_name(period: str = 'D') -> str:
     """
     根据周期标识返回中文名称
 
@@ -77,6 +80,7 @@ def get_period_name(period:str='D') -> str:
     }
     period = period.upper()
     return period_names.get(period, period)
+
 
 def convert_klines_trading(klines, period='D'):
     """
@@ -110,7 +114,7 @@ def convert_klines_trading(klines, period='D'):
 
     # 聚合数据，date字段保留实际的交易日
     result = df.groupby(groups).agg({
-        'date': 'last',      # 实际最后一个交易日
+        'date': 'last',  # 实际最后一个交易日
         'open': 'first',
         'high': 'max',
         'low': 'min',
@@ -166,14 +170,14 @@ def get_sector_constituents(code: str) -> list[str]:
     return list
 
 
-def date_format(date: str, layout:str='%Y-%m-%d') -> str:
+def date_format(date: str, layout: str = '%Y-%m-%d') -> str:
     dt = parser.parse(date)  # 自动识别各种常见日期格式
     return dt.strftime(layout)
 
 
 @lru_cache(maxsize=None)
-def get_tick_data(code: str, date: str) -> DataFrame | None:
-    """获取分时"""
+def get_minutes_data(code: str, date: str) -> DataFrame | None:
+    """获取分时数据"""
     code = code.strip()
     corrected_symbol = exchange.correct_security_code(code)
     file_extension = '.csv'
@@ -191,8 +195,40 @@ def get_tick_data(code: str, date: str) -> DataFrame | None:
         return pd.read_csv(full_path)
     return None
 
+
 @lru_cache(maxsize=None)
-def get_tick_transation(code: str, date: str) -> DataFrame | None:
+def cache_f10(date: str = None) -> DataFrame:
+    factor_name = 'f10'
+    trade_date = date or exchange.last_trade_date()
+    file_extension = fix_trade_date(trade_date)
+    filename = f"{factor_name}.{file_extension}"
+    year = trade_date[:4]
+    base_path = os.path.join(base.config.data_path, 'flash')
+    return pd.read_csv(os.path.join(base_path, year, filename))
+
+
+def get_f10(code: str, date: str = None) -> Dict[str, Any]:
+    """
+    获取f10数据
+    Args:
+        code: 证券代码
+        date: 日期
+
+    Returns:
+        返回f10数据
+    """
+    security_code = exchange.correct_security_code(code)
+    df = cache_f10(date)
+    result_df = df[df['Code'] == security_code]
+    if result_df.empty:
+        return {}
+
+    # 取第一行，转为字典
+    return result_df.iloc[0].to_dict()
+
+
+@lru_cache(maxsize=None)
+def get_tick_transaction(code: str, date: str) -> DataFrame | None:
     """获取分时"""
     code = code.strip()
     corrected_symbol = exchange.correct_security_code(code)
@@ -210,6 +246,7 @@ def get_tick_transation(code: str, date: str) -> DataFrame | None:
     if os.path.isfile(full_path):
         return pd.read_csv(full_path)
     return None
+
 
 if __name__ == '__main__':
     print(base.get_quant1x_config_filename())
@@ -236,7 +273,9 @@ if __name__ == '__main__':
     print(l1)
     print(type(l1))
 
-    df2 = get_tick_data(code, date='2025-06-20')
+    df2 = get_minutes_data(code, date='2025-06-20')
     print(df2)
-    df3 = get_tick_transation(code, date='2025-06-20')
+    df3 = get_tick_transaction(code, date='2025-06-20')
     print(df3)
+    df4 = get_f10(code)
+    print(df4)
