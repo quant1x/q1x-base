@@ -283,7 +283,7 @@ def option_finance_board(
         return DataFrame()
 
 
-def option_risk_indicator_sse(date: str = "20240626") -> pd.DataFrame:
+def option_risk_indicator_sse(date: str = "20150801") -> pd.DataFrame:
     """
     上海证券交易所-产品-股票期权-期权风险指标
     http://www.sse.com.cn/assortment/options/risk/
@@ -328,15 +328,11 @@ def option_risk_indicator_sse(date: str = "20240626") -> pd.DataFrame:
             "IMPLC_VOLATLTY",
         ]
     ]
-    temp_df["TRADE_DATE"] = pd.to_datetime(
-        temp_df["TRADE_DATE"], errors="coerce"
-    ).dt.date
+    temp_df["TRADE_DATE"] = pd.to_datetime(temp_df["TRADE_DATE"], errors="coerce").dt.date
     temp_df["DELTA_VALUE"] = pd.to_numeric(temp_df["DELTA_VALUE"], errors="coerce")
     temp_df["THETA_VALUE"] = pd.to_numeric(temp_df["THETA_VALUE"], errors="coerce")
     temp_df["GAMMA_VALUE"] = pd.to_numeric(temp_df["GAMMA_VALUE"], errors="coerce")
     temp_df["VEGA_VALUE"] = pd.to_numeric(temp_df["VEGA_VALUE"], errors="coerce")
     temp_df["RHO_VALUE"] = pd.to_numeric(temp_df["RHO_VALUE"], errors="coerce")
-    temp_df["IMPLC_VOLATLTY"] = pd.to_numeric(
-        temp_df["IMPLC_VOLATLTY"], errors="coerce"
-    )
+    temp_df["IMPLC_VOLATLTY"] = pd.to_numeric( temp_df["IMPLC_VOLATLTY"], errors="coerce")
     return temp_df
