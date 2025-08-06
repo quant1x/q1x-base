@@ -3,12 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.17] - 2025-08-06
+### Changed
+- 将早盘集合竞价代码源文件名加上test前缀
+
 ## [0.6.16] - 2025-08-06
 ### Changed
 - 优化过滤函数, 可自定比较操作符号
 - 优化vix算法, 修正K0的计算方法
 - 删除废弃的实验代码
 - 新增两个波浪检测实验性代码
+- update changelog
 
 ## [0.6.15] - 2025-08-05
 ### Changed
@@ -378,7 +383,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.16...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.17...HEAD
+[0.6.17]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.16...v0.6.17
 [0.6.16]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.15...v0.6.16
 [0.6.15]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.14...v0.6.15
 [0.6.14]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.13...v0.6.14
