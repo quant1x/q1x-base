@@ -210,13 +210,13 @@ def find_monotonic_extremes(data_list, direction='left', mode='peak') -> list[in
         >>> data = [3, 2, 1, 2, 3, 2, 1, 4, 3, 2, 5]
         >>> # 波峰检测
         >>> find_monotonic_extremes(data, 'left', 'peak')
-        [4, 7, 10]
+        [0, 7, 10]
         >>> # 波谷检测
         >>> find_monotonic_extremes(data, 'left', 'valley')
-        [2, 6, 9]
+        [2]
         >>> # 右向扫描（结果仍按原始顺序返回）
         >>> find_monotonic_extremes(data, 'right', 'peak')
-        [4, 7, 10]
+        [10]
     """
     if not data_list:
         return []
