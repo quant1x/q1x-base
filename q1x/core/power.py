@@ -504,7 +504,7 @@ class EnhancedControlDegreeFramework:
 
 if __name__ == "__main__":
     # 示例用法
-    stock_list = ['sh603488', 'sz000158']
+    stock_list = ['sh000001', 'sz000158']
 
     try:
         framework = EnhancedControlDegreeFramework()
