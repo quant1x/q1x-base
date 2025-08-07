@@ -119,7 +119,8 @@ def convert_klines_trading(klines, period='D'):
         'high': 'max',
         'low': 'min',
         'close': 'last',
-        'volume': 'sum'
+        'volume': 'sum',
+        'amount': 'sum'
     }).reset_index(drop=True)
 
     return result
