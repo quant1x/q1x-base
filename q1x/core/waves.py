@@ -8,11 +8,15 @@
 @Date    : 2025/7/29 13:17
 @Desc    : 波浪检测
 """
-
+from dataclasses import dataclass
+from datetime import datetime, date
 from operator import lt, le, gt, ge
-from typing import List, Tuple
+from typing import List, Tuple, Literal, Dict, Optional
 
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
 
 
 def filter_sequence(arr, op: str = '<='):
@@ -682,3 +686,504 @@ def detect_main_wave_in_range(high_list, low_list):
         high_list, peaks, valleys, segments
     )
     return segments, path_points, peak_points, valley_points
+
+
+@dataclass
+class WaveSegment:
+    start: int
+    end: int
+    level: int
+    is_rising: bool
+
+    def duration(self) -> int:
+        return self.end - self.start
+
+    def __repr__(self):
+        trend = "↑" if self.is_rising else "↓"
+        return f"[{self.start}→{self.end}]{trend}(L{self.level})"
+
+
+TrendType = Literal["up", "down", "sideways", "uncertain"]
+
+
+def determine_current_trend(
+        segments: list,
+        high_list: list,
+        low_list: list,
+        lookback: int = 5
+) -> dict:
+    """
+    基于波段结构判断当前趋势
+    segments: List[Tuple[start, end, level, is_rising]]
+    """
+    if not segments:
+        return {"trend": "uncertain", "confidence": 0.0, "reason": "no segments"}
+
+    # 按 start 排序（元组第0个元素）
+    sorted_segs = sorted(segments, key=lambda x: x[0])  # x[0] = start
+
+    # 取最近若干波段
+    recent = sorted_segs[-lookback:]
+
+    # ----------------------------
+    # 1. 最近波段方向
+    # ----------------------------
+    last_seg = recent[-1]
+    primary_trend = "up" if last_seg[3] else "down"  # x[3] = is_rising
+
+    # ----------------------------
+    # 2. 波峰波谷演化
+    # ----------------------------
+    rising_segs = [s for s in recent if s[3]]  # is_rising
+    falling_segs = [s for s in recent if not s[3]]
+
+    # 提取波峰（上升段的 end）
+    peaks = []
+    for s in rising_segs:
+        end_idx = s[1]
+        if end_idx < len(high_list):
+            peaks.append((end_idx, high_list[end_idx]))
+    peaks.sort(key=lambda x: x[0])  # 按索引排序
+
+    # 提取波谷（下降段的 end）
+    valleys = []
+    for s in falling_segs:
+        end_idx = s[1]
+        if end_idx < len(low_list):
+            valleys.append((end_idx, low_list[end_idx]))
+    valleys.sort(key=lambda x: x[0])
+
+    hh = hl = lh = ll = False
+    if len(peaks) >= 2:
+        hh = peaks[-1][1] > peaks[-2][1]
+        lh = peaks[-1][1] < peaks[-2][1]
+    if len(valleys) >= 2:
+        hl = valleys[-1][1] > valleys[-2][1]
+        ll = valleys[-1][1] < valleys[-2][1]
+
+    structural_trend = "uncertain"
+    if hh and hl:
+        structural_trend = "up"
+    elif lh and ll:
+        structural_trend = "down"
+    elif hh and ll:
+        structural_trend = "sideways"
+    elif lh and hl:
+        structural_trend = "sideways"
+    else:
+        structural_trend = primary_trend
+
+    # ----------------------------
+    # 3. 多层级动量支持
+    # ----------------------------
+    sub_level = [s for s in recent if s[2] > 0]  # level > 0
+    if sub_level:
+        sub_rising_ratio = sum(1 for s in sub_level if s[3]) / len(sub_level)
+        momentum_support = "strong" if (primary_trend == "up" and sub_rising_ratio > 0.6) or \
+                                       (primary_trend == "down" and sub_rising_ratio < 0.4) \
+            else "weak"
+    else:
+        momentum_support = "neutral"
+
+    # ----------------------------
+    # 4. 趋势强度评分
+    # ----------------------------
+    durations = [s[1] - s[0] for s in recent]  # end - start
+    magnitudes = []
+    for s in recent:
+        try:
+            if s[3]:  # is_rising
+                mag = high_list[s[1]] - low_list[s[0]]
+            else:
+                mag = low_list[s[1]] - high_list[s[0]]
+            magnitudes.append(abs(mag))
+        except:
+            pass
+
+    avg_duration = sum(durations) / len(durations) if durations else 0
+    avg_magnitude = sum(magnitudes) / len(magnitudes) if magnitudes else 0
+
+    consecutive = 1
+    for i in range(len(recent) - 1, 0, -1):
+        if recent[i][3] == recent[i - 1][3]:
+            consecutive += 1
+        else:
+            break
+
+    confidence = 0.3
+    if structural_trend == primary_trend:
+        confidence += 0.4
+    if momentum_support == "strong":
+        confidence += 0.2
+    if consecutive >= 3:
+        confidence += 0.1
+
+    final_trend = structural_trend if structural_trend in ("up", "down") else primary_trend
+
+    return {
+        "trend": final_trend,
+        "confidence": round(confidence, 2),
+        "primary_signal": primary_trend,
+        "structural_signal": structural_trend,
+        "momentum_support": momentum_support,
+        "consecutive_segments": consecutive,
+        "avg_duration": round(avg_duration, 1),
+        "avg_magnitude": round(avg_magnitude, 4),
+        "last_segment": last_seg[:4],
+        "peaks": [p[0] for p in peaks[-3:]],
+        "valleys": [v[0] for v in valleys[-3:]],
+        "reason": f"Structural: {structural_trend}, Momentum: {momentum_support}, Consecutive: {consecutive}"
+    }
+
+def plot_trend_from_extremes(
+        klines: pd.DataFrame,
+        trend_result: dict,
+        figsize=(16, 9)
+):
+    """
+    可视化基于5个极值点的趋势分析，并绘制波峰/波谷趋势线在当前时刻的延伸
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+
+    # 确保日期是 datetime 类型
+    dates = pd.to_datetime(klines['date'])
+    high_list = klines['high'].values
+    low_list = klines['low'].values
+    close_price = klines['close'].iloc[-1]
+
+    # 创建图形
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # 绘制高低价背景线
+    ax.plot(dates, high_list, color='lightgray', alpha=0.5, linewidth=1, label='High')
+    ax.plot(dates, low_list, color='lightgray', alpha=0.5, linewidth=1, label='Low')
+
+    # 提取极值点信息
+    indices = trend_result['indices']
+    types = trend_result['price_structure']
+    extreme_prices = [high_list[i] if t == 'peak' else low_list[i] for i, t in zip(indices, types)]
+    extreme_dates = dates.iloc[indices]
+
+    # 分离波峰和波谷
+    peaks = [(d, p) for d, p, t in zip(extreme_dates, extreme_prices, types) if t == 'peak']
+    valleys = [(d, p) for d, p, t in zip(extreme_dates, extreme_prices, types) if t == 'valley']
+
+    # ----------------------------
+    # 绘制连接线（谷→峰，峰→谷）
+    # ----------------------------
+    # 1. 波谷 → 波峰（红实线，上升段）
+    for i in range(len(types) - 1):
+        if types[i] == 'valley' and types[i + 1] == 'peak':
+            ax.plot([extreme_dates.iloc[i], extreme_dates.iloc[i + 1]],
+                    [extreme_prices[i], extreme_prices[i + 1]],
+                    color='red', linewidth=2.5, alpha=0.8, solid_capstyle='round')
+
+    # 2. 波峰 → 波谷（绿实线，下降段）
+    for i in range(len(types) - 1):
+        if types[i] == 'peak' and types[i + 1] == 'valley':
+            ax.plot([extreme_dates.iloc[i], extreme_dates.iloc[i + 1]],
+                    [extreme_prices[i], extreme_prices[i + 1]],
+                    color='green', linewidth=2.5, alpha=0.8, solid_capstyle='round')
+
+    # ----------------------------
+    # ✅ 绘制波峰和波谷的趋势延长线（从第一个极值点延伸到最新K线）
+    # ----------------------------
+    last_date = dates.iloc[-1]  # 最后一个交易日
+    upper_at_last = None
+    lower_at_last = None
+
+    # 波峰趋势线（红虚线）：峰 → 峰
+    if len(peaks) >= 2:
+        p_dates, p_prices = zip(*peaks)
+        # 将日期转为数值（时间戳）
+        p_timestamps = [d.timestamp() for d in p_dates]
+        # 拟合一次线性回归
+        z = np.polyfit(p_timestamps, p_prices, 1)
+        poly_upper = np.poly1d(z)
+        # 计算从第一个峰到最后一个K线的延长线
+        extended_x = [mdates.date2num(p_dates[0]), mdates.date2num(last_date)]
+        extended_y = [poly_upper(p_dates[0].timestamp()), poly_upper(last_date.timestamp())]
+        # 使用 matplotlib 绘图（支持 datetime）
+        ax.plot(extended_x, extended_y, color='red', linestyle='--', linewidth=2,
+                alpha=0.8, label='阻力趋势线（峰→当前）')
+        # ✅ 记录当前上轨值
+        upper_at_last = poly_upper(last_date.timestamp())
+        ax.scatter(last_date, upper_at_last, color='red', s=80, zorder=6, marker='x', linewidth=2)
+
+    # 波谷趋势线（绿虚线）：谷 → 谷
+    if len(valleys) >= 2:
+        v_dates, v_prices = zip(*valleys)
+        v_timestamps = [d.timestamp() for d in v_dates]
+        z = np.polyfit(v_timestamps, v_prices, 1)
+        poly_lower = np.poly1d(z)
+        extended_x = [mdates.date2num(v_dates[0]), mdates.date2num(last_date)]
+        extended_y = [poly_lower(v_dates[0].timestamp()), poly_lower(last_date.timestamp())]
+        ax.plot(extended_x, extended_y, color='green', linestyle='--', linewidth=2,
+                alpha=0.8, label='支撑趋势线（谷→当前）')
+        # ✅ 记录当前下轨值
+        lower_at_last = poly_lower(last_date.timestamp())
+        ax.scatter(last_date, lower_at_last, color='green', s=80, zorder=6, marker='x', linewidth=2)
+
+    # ----------------------------
+    # ✅ 绘制当前时刻的垂直线 & 通道标注
+    # ----------------------------
+    ax.axvline(last_date, color='gray', linestyle='-', linewidth=1.5, alpha=0.6)
+    ax.text(last_date, ax.get_ylim()[1], ' 当前', fontsize=10, color='gray',
+            verticalalignment='bottom', horizontalalignment='left',
+            bbox=dict(boxstyle="round,pad=0.2", facecolor="white", alpha=0.7, edgecolor="gray"))
+
+    # ----------------------------
+    # 绘制极值点并标注序号
+    # ----------------------------
+    # 波峰（红圈）
+    if peaks:
+        p_dates, p_prices = zip(*peaks)
+        ax.scatter(p_dates, p_prices, color='red', s=120, zorder=5, edgecolors='black', linewidth=1.5, label='波峰')
+
+    # 波谷（绿圈）
+    if valleys:
+        v_dates, v_prices = zip(*valleys)
+        ax.scatter(v_dates, v_prices, color='green', s=120, zorder=5, edgecolors='black', linewidth=1.5, label='波谷')
+
+    # 标注序号
+    for i, (d, p, t) in enumerate(zip(extreme_dates, extreme_prices, types)):
+        ax.annotate(f'{i + 1}', (d, p), xytext=(0, 10 if t == 'valley' else -15),
+                    textcoords='offset points', fontsize=12, ha='center', weight='bold',
+                    bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.8, edgecolor="darkred"))
+
+    # ----------------------------
+    # 图表装饰
+    # ----------------------------
+    title = f"趋势分析：{trend_result['trend'].upper()} (置信度: {trend_result['confidence']:.2f})"
+    ax.set_title(title, fontsize=16, pad=20, color='darkblue', weight='bold')
+
+    reason = f"依据: {trend_result['reason']}"
+    props = dict(boxstyle="round,pad=0.5", facecolor="wheat", alpha=0.85, edgecolor="brown")
+    ax.text(0.02, 0.98, reason, transform=ax.transAxes, fontsize=11,
+            verticalalignment='top', bbox=props, family='SimHei')
+
+    ax.set_xlabel("日期", fontsize=12)
+    ax.set_ylabel("价格", fontsize=12)
+    ax.legend(loc='upper left', fontsize=10, framealpha=0.9)
+    ax.grid(True, alpha=0.3, linestyle='--')
+
+    # 日期格式
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # 显示
+    plt.show()
+
+    # ✅ 安全打印当前通道信息（只有当 upper_at_last 和 lower_at_last 被赋值时才打印）
+    if upper_at_last is not None and lower_at_last is not None:
+        print(f"📈 当前通道状态（{last_date.strftime('%Y-%m-%d')}）:")
+        print(f"   上轨（阻力）: {upper_at_last:.4f}")
+        print(f"   下轨（支撑）: {lower_at_last:.4f}")
+        print(f"   通道宽度: {upper_at_last - lower_at_last:.4f}")
+        print(f"   当前收盘价: {close_price:.4f}")
+        print(f"   价格位置: {'突破上轨' if close_price > upper_at_last else '跌破下轨' if close_price < lower_at_last else '通道内'}")
+    elif upper_at_last is not None:
+        print(f"📉 仅波峰趋势线有效，当前阻力: {upper_at_last:.4f}")
+    elif lower_at_last is not None:
+        print(f"📉 仅波谷趋势线有效，当前支撑: {lower_at_last:.4f}")
+    else:
+        print("⚠️ 无法绘制趋势线：波峰或波谷不足2个")
+
+def determine_trend_from_last_5_extremes(
+        segments: List[Tuple[int, int, int, bool]],
+        high_list: List[float],
+        low_list: List[float],
+        klines: pd.DataFrame
+) -> Dict:
+    # ----------------------------
+    # Phase 0: 输入校验与预处理
+    # ----------------------------
+    if len(segments) < 2 or len(high_list) == 0 or len(low_list) == 0:
+        return {"trend": "uncertain", "confidence": 0.0, "reason": "输入数据不足"}
+
+    if 'date' not in klines.columns:
+        return {"trend": "uncertain", "confidence": 0.0, "reason": "klines 缺少 'date' 列"}
+
+    # 确保 date 是 pd.Timestamp 类型
+    if not isinstance(klines['date'].iloc[0], pd.Timestamp):
+        klines['date'] = pd.to_datetime(klines['date'])
+
+    # ----------------------------
+    # Phase 1: 提取极值点（使用 pd.Timestamp）
+    # ----------------------------
+    points = []  # (index, type, price, date: pd.Timestamp)
+
+    prev_end = -1
+    for seg in sorted(segments, key=lambda x: x[0]):
+        start, end, level, is_rising = seg
+        if seg[2] != 0:  # 只处理 level == 0 的段？
+            continue
+        if end <= prev_end or end >= len(high_list) or end >= len(low_list):
+            continue
+        prev_end = end
+
+        bar_date = klines.iloc[end]['date']
+        if pd.isna(bar_date):
+            continue
+
+        if is_rising:
+            price = high_list[end]
+            points.append((end, "peak", price, bar_date))
+        else:
+            price = low_list[end]
+            points.append((end, "valley", price, bar_date))
+
+    if len(points) < 3:
+        return {"trend": "uncertain", "confidence": 0.0, "reason": f"有效极值点不足3个（{len(points)}个）"}
+
+    recent = points[-5:]  # 最近5个极值点
+
+    # ----------------------------
+    # Phase 2: 基于结构模式赋初值（Define）
+    # ----------------------------
+    trend_scores = {"up": 0.0, "down": 0.0, "sideways": 0.0, "reversal": 0.0}
+    reasons = []
+
+    prices = [p[2] for p in recent]
+    types = [p[1] for p in recent]
+
+    peak_prices = [p[2] for p in recent if p[1] == "peak"]
+    valley_prices = [p[2] for p in recent if p[1] == "valley"]
+
+    def is_increasing(seq, threshold=0.02):
+        return len(seq) >= 2 and all(seq[i+1] > seq[i] * (1 + threshold) for i in range(len(seq)-1))
+
+    def is_decreasing(seq, threshold=0.02):
+        return len(seq) >= 2 and all(seq[i+1] < seq[i] * (1 - threshold) for i in range(len(seq)-1))
+
+    if len(peak_prices) >= 2 and len(valley_prices) >= 2:
+        if is_increasing(peak_prices) and is_increasing(valley_prices):
+            trend_scores["up"] += 0.8
+            reasons.append("HH + HL")
+        elif is_decreasing(peak_prices) and is_decreasing(valley_prices):
+            trend_scores["down"] += 0.8
+            reasons.append("LH + LL")
+        elif is_increasing(peak_prices) and is_decreasing(valley_prices):
+            trend_scores["sideways"] += 0.6
+            reasons.append("HH + LL (扩散震荡)")
+        elif is_decreasing(peak_prices) and is_increasing(valley_prices):
+            trend_scores["reversal"] += 0.6
+            reasons.append("LH + HL (收敛，潜在反转)")
+
+    # ----------------------------
+    # Phase 3: 基于通道结构修正（Refine）
+    # ----------------------------
+    peaks = [(p[3], p[2]) for p in recent if p[1] == "peak"]  # [(date, price)]
+    valleys = [(v[3], v[2]) for v in recent if v[1] == "valley"]
+
+    if len(peaks) >= 2 and len(valleys) >= 2:
+        # 提取前两个波峰和波谷（最早两个）
+        (p1_date, p1_price), (p2_date, p2_price) = peaks[0], peaks[1]
+        (v1_date, v1_price), (v2_date, v2_price) = valleys[0], valleys[1]
+
+        # 统一时间基准（以最早日期为0）
+        base_date = min(p1_date, p2_date, v1_date, v2_date, klines['date'].iloc[-1])
+
+        def date_to_days(date):
+            return (date - base_date).total_seconds() / (24 * 3600)  # 转为天数（float）
+
+        peak_days = [date_to_days(p1_date), date_to_days(p2_date)]
+        valley_days = [date_to_days(v1_date), date_to_days(v2_date)]
+        last_date_num = date_to_days(klines['date'].iloc[-1])  # 当前K线时间
+        last_price = float(klines['close'].iloc[-1])
+
+        # 拟合直线：y = kx + b
+        def fit_line(x_vals, y_vals):
+            x1, x2 = x_vals
+            y1, y2 = y_vals
+            if abs(x2 - x1) < 1e-8:
+                k = 0.0
+            else:
+                k = (y2 - y1) / (x2 - x1)
+            b = y1 - k * x1
+            return k, b
+
+        try:
+            k_upper, b_upper = fit_line(peak_days, [p1_price, p2_price])
+            k_lower, b_lower = fit_line(valley_days, [v1_price, v2_price])
+        except Exception as e:
+            reasons.append("通道拟合失败")
+            # 跳过通道分析
+        else:
+            # 计算当前时刻（最新K线时间）对应的上下轨值
+            current_upper = k_upper * last_date_num + b_upper
+            current_lower = k_lower * last_date_num + b_lower
+
+            if current_upper < current_lower:
+                # 防止上下轨颠倒
+                current_upper, current_lower = current_lower, current_upper
+
+            # 判断通道形态（基于斜率）
+            slope_diff = k_upper - k_lower  # 上轨斜率 - 下轨斜率
+
+            if k_upper < 0 and k_lower > 0:
+                channel_status = "converging"  # 上轨↓ 下轨↑ → 收敛
+            elif k_upper > 0 and k_lower < 0:
+                channel_status = "diverging"   # 上轨↑ 下轨↓ → 扩散
+            elif abs(slope_diff) < 1e-5:
+                channel_status = "parallel"
+            elif slope_diff < 0:
+                channel_status = "converging"
+            else:
+                channel_status = "diverging"
+
+            # 更新评分
+            if channel_status == "converging":
+                reasons.append("通道收敛")
+                trend_scores["reversal"] += 0.2
+            elif channel_status == "diverging":
+                reasons.append("通道扩散")
+                if trend_scores["up"] > trend_scores["down"]:
+                    trend_scores["up"] += 0.1
+                elif trend_scores["down"] > trend_scores["up"]:
+                    trend_scores["down"] += 0.1
+            else:  # parallel
+                reasons.append("通道平行")
+                if trend_scores["up"] > trend_scores["down"]:
+                    trend_scores["up"] += 0.1
+                elif trend_scores["down"] > trend_scores["up"]:
+                    trend_scores["down"] += 0.1
+
+            # 检查价格与通道关系
+            if last_price > current_upper:
+                reasons.append("价格突破上轨")
+            elif last_price < current_lower:
+                reasons.append("价格跌破下轨")
+            else:
+                reasons.append("价格位于通道内")
+
+    # ----------------------------
+    # Phase 4: 归一化与决策
+    # ----------------------------
+    total = sum(trend_scores.values())
+    if total > 1e-5:
+        for k in trend_scores:
+            trend_scores[k] /= total
+    else:
+        trend_scores = {k: round(1 / len(trend_scores), 2) for k in trend_scores}
+
+    main_trend = max(trend_scores, key=trend_scores.get)
+    confidence = trend_scores[main_trend]
+
+    return {
+        "trend": main_trend,
+        "confidence": round(confidence, 2),
+        "reason": "; ".join(reasons),
+        "extreme_points": [
+            (idx, typ, round(pri, 4), date.strftime('%Y-%m-%d'))
+            for idx, typ, pri, date in recent
+        ],
+        "peak_prices": [round(p, 4) for p in peak_prices],
+        "valley_prices": [round(p, 4) for p in valley_prices],
+        "price_structure": types,
+        "indices": [p[0] for p in recent],
+        "trend_scores": {k: round(v, 3) for k, v in trend_scores.items()}
+    }
