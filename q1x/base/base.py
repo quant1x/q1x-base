@@ -13,6 +13,7 @@ def get_quant1x_config_filename() -> str:
     # 默认配置文件名
     default_config_filename = 'quant1x.yaml'
     yaml_filename = os.path.join('~', 'runtime', 'etc', default_config_filename)
+    yaml_filename = os.path.expanduser(yaml_filename)
     user_home = file.homedir()
     if not os.path.isfile(yaml_filename):
         quant1x_root = os.path.join(user_home, '.quant1x')
