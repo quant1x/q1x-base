@@ -3,9 +3,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.18] - 2025-08-16
+### Changed
+- 修正示例代码
+- 调整检测代码, 增加上证指数
+- 新增构建波浪结构的函数
+- 新增检测波峰波谷的测试代码
+- 整理波浪测试代码
+- K线周期转换补充成交金额
+- 优化波段结构
+- 修正~/runtime/etc路径, 需要解析成真实路径
+
 ## [0.6.17] - 2025-08-06
 ### Changed
 - 将早盘集合竞价代码源文件名加上test前缀
+- update changelog
 
 ## [0.6.16] - 2025-08-06
 ### Changed
@@ -383,7 +395,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - 新增Changelog
 
 
-[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.17...HEAD
+[Unreleased]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.18...HEAD
+[0.6.18]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.17...v0.6.18
 [0.6.17]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.16...v0.6.17
 [0.6.16]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.15...v0.6.16
 [0.6.15]: https://gitee.com/quant1x/q1x-base.git/compare/v0.6.14...v0.6.15
